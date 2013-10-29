@@ -37,6 +37,6 @@ public class InputHandler : MonoBehaviour {
 						Input.GetAxis (id + "Horizontal"),
 						0f,
 						Input.GetAxis  (id + "Vertical"));
-		swimmer.rigidbody.velocity = id(vector * BasePower * Time.deltaTime);
+		swimmer.rigidbody.velocity = (vector * BasePower * Time.deltaTime);
 	}
 }
