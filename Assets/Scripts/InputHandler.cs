@@ -4,6 +4,7 @@ using System.Collections;
 public class InputHandler : MonoBehaviour {
 	
 	public float BasePower = 100.0f;
+	public float BaseSpeed = 1.0f;
 	
 	private GameObject P1LeftSwimmer;
 	private GameObject P1RightSwimmer;
@@ -36,6 +37,6 @@ public class InputHandler : MonoBehaviour {
 						Input.GetAxis (id + "Horizontal"),
 						0f,
 						Input.GetAxis  (id + "Vertical"));
-		swimmer.rigidbody.AddForce (vector * BasePower * Time.deltaTime);
+		swimmer.rigidbody.velocity = id(vector * BasePower * Time.deltaTime);
 	}
 }
