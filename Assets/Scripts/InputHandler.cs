@@ -26,8 +26,6 @@ public class InputHandler : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		UpdateAllMovement ();
-		
-		//P1LeftSwimmer.rigidbody.velocity = new Vector3(100f, 0f, 100f);
 	}
 	
 	void UpdateAllMovement () {
