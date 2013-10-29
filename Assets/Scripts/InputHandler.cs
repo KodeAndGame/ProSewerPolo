@@ -3,7 +3,7 @@ using System.Collections;
 
 public class InputHandler : MonoBehaviour {
 	
-	public float BaseSpeed = 50.0f;
+	public float BaseSpeed = 700.0f;
 	
 	private GameObject P1LeftSwimmer;
 	private GameObject P1RightSwimmer;
@@ -12,15 +12,25 @@ public class InputHandler : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		P1LeftSwimmer = GameObject.Find("P1LeftSwimmer");
-		P1RightSwimmer = GameObject.Find("P1RightSwimmer");
-		P2LeftSwimmer = GameObject.Find("P2LeftSwimmer");
-		P2RightSwimmer = GameObject.Find("P2RightSwimmer");
+		InitializeSwimmers();
+	}
+	
+	void InitializeSwimmers() {
+		P1LeftSwimmer = InitializeSwimmer ("P1" , "Left");
+		P1RightSwimmer = InitializeSwimmer ("P1" , "Right");
+		P2LeftSwimmer = InitializeSwimmer ("P2" , "Left");
+		P2RightSwimmer = InitializeSwimmer ("P2" , "Right");
+	}
+	
+	GameObject InitializeSwimmer (string playerIdentifier, string swimmerIdentifier) {
+		var id = playerIdentifier + swimmerIdentifier;
+		var swimmer = GameObject.Find (id + "Swimmer");
 		
-		if(P1LeftSwimmer == null) {Debug.Log("P1 Left does not exist in scene");}
-		if(P1RightSwimmer == null) {Debug.Log("P1 Right does not exist in scene");}
-		if(P2LeftSwimmer == null) {Debug.Log("P2 Left does not exist in scene");}
-		if(P2RightSwimmer == null) {Debug.Log("P2 Right does not exist in scene");}
+		if(swimmer == null) {
+			Debug.Log (id + " swimmer does not exist in scene");
+		}
+		
+		return swimmer;
 	}
 	
 	// Update is called once per frame
