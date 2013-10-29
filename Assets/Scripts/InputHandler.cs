@@ -3,8 +3,7 @@ using System.Collections;
 
 public class InputHandler : MonoBehaviour {
 	
-	public float BasePower = 100.0f;
-	public float BaseSpeed = 1.0f;
+	public float BaseSpeed = 50.0f;
 	
 	private GameObject P1LeftSwimmer;
 	private GameObject P1RightSwimmer;
@@ -27,6 +26,8 @@ public class InputHandler : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		UpdateAllMovement ();
+		
+		//P1LeftSwimmer.rigidbody.velocity = new Vector3(100f, 0f, 100f);
 	}
 	
 	void UpdateAllMovement () {
@@ -46,6 +47,6 @@ public class InputHandler : MonoBehaviour {
 						Input.GetAxis (id + "Horizontal"),
 						0f,
 						Input.GetAxis  (id + "Vertical"));
-		swimmer.rigidbody.velocity = vector * BasePower * Time.deltaTime;
+		swimmer.rigidbody.velocity = vector * BaseSpeed * Time.deltaTime;
 	}
 }
