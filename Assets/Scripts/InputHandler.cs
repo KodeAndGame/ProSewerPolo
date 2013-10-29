@@ -17,6 +17,11 @@ public class InputHandler : MonoBehaviour {
 		P1RightSwimmer = GameObject.Find("P1RightSwimmer");
 		P2LeftSwimmer = GameObject.Find("P2LeftSwimmer");
 		P2RightSwimmer = GameObject.Find("P2RightSwimmer");
+		
+		if(P1LeftSwimmer == null) {Debug.Log("P1 Left does not exist in scene");}
+		if(P1RightSwimmer == null) {Debug.Log("P1 Right does not exist in scene");}
+		if(P2LeftSwimmer == null) {Debug.Log("P2 Left does not exist in scene");}
+		if(P2RightSwimmer == null) {Debug.Log("P2 Right does not exist in scene");}
 	}
 	
 	// Update is called once per frame
@@ -32,11 +37,15 @@ public class InputHandler : MonoBehaviour {
 	}
 	
 	void UpdateMovement (GameObject swimmer, string playerIdentifier, string swimmerIdentifier) {
+		if(swimmer == null) {
+			return;
+		}
+		
 		var id  = playerIdentifier + swimmerIdentifier;
 		var vector = new Vector3 (
 						Input.GetAxis (id + "Horizontal"),
 						0f,
 						Input.GetAxis  (id + "Vertical"));
-		swimmer.rigidbody.velocity = (vector * BasePower * Time.deltaTime);
+		swimmer.rigidbody.velocity = vector * BasePower * Time.deltaTime;
 	}
 }
