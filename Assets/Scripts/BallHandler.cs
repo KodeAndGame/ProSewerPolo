@@ -20,6 +20,7 @@ public class BallHandler : MonoBehaviour {
 				Debug.Log ("No Ball Anchor exists on " + collision.gameObject.name);
 				return;
 			}
+			rigidbody.isKinematic = true;
 			rigidbody.detectCollisions = false;
 			rigidbody.velocity = Vector3.zero;
 			

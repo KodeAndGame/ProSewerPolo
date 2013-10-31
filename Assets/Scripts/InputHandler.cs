@@ -3,7 +3,8 @@ using System.Collections;
 
 public class InputHandler : MonoBehaviour {
 	
-	public float BaseSpeed = 700.0f;
+	public float BaseSpeed = 700f;
+	public float BaseKickPower = 2000f;
 	
 	private GameObject p1LeftSwimmer;
 	private GameObject p1RightSwimmer;
@@ -52,18 +53,15 @@ public class InputHandler : MonoBehaviour {
 	}
 	
 	void HandleShootBall() {
-		/*
 		if(Input.GetAxis ("Shoot") <= 0f || ball.transform.parent == null) {
 			return;
 		}
 		
-		//var ballAnchor = ball.transform.parent;
 		ball.transform.parent = null;
-		//ball.rigidbody.detectCollisions = true;
-		var force = direction * 20000f;
+		ball.rigidbody.isKinematic = false;
+		ball.rigidbody.detectCollisions = true;
+		var force = direction * BaseKickPower;
 		ball.rigidbody.AddForce (force);
-		Debug.Log (force);
-		*/
 	}
 	
 	void UpdateAllMovement () {
