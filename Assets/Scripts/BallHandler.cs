@@ -21,7 +21,7 @@ public class BallHandler : MonoBehaviour {
 				return;
 			}
 			rigidbody.detectCollisions = false;
-			//rigidbody.velocity = Vector3.zero;
+			rigidbody.velocity = Vector3.zero;
 			
 			transform.parent = ballAnchor;
 			transform.localPosition = new Vector3(1f, 0f, 0f);
