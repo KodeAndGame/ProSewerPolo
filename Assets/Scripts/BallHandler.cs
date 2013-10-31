@@ -14,10 +14,18 @@ public class BallHandler : MonoBehaviour {
 	}
 	
 	void OnCollisionEnter(Collision collision) {
-		if (collision.gameObject.tag == "Player" && transform.parent == null) {
-			transform.parent = collision.gameObject.transform;
-			rigidbody.velocity = Vector3.zero;
-			Debug.Log ("done");
+		if (collision.gameObject.tag == "Player" && transform.parent == null) {		
+			var ballAnchor = collision.gameObject.transform.Find("BallAnchor");
+			if(ballAnchor == null) {
+				Debug.Log ("No Ball Anchor exists on " + collision.gameObject.name);
+				return;
+			}
+			rigidbody.detectCollisions = false;
+			//rigidbody.velocity = Vector3.zero;
+			
+			transform.parent = ballAnchor;
+			transform.localPosition = new Vector3(1f, 0f, 0f);
+			transform.rotation = Quaternion.Euler(0f, 0f, 0f);
 		}
 	}
 }

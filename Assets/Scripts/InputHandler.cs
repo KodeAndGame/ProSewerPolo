@@ -30,13 +30,6 @@ public class InputHandler : MonoBehaviour {
 			Debug.Log (id + " swimmer does not exist in scene");
 		}
 		
-		//TODO: Move this code later
-		var ball = swimmer.transform.Find("BallAnchor/Ball");
-		var ballAnchor = swimmer.transform.Find("BallAnchor");
-		if(ball != null && ballAnchor != null) {
-			ball.rigidbody.detectCollisions = false;
-		}
-		
 		return swimmer;
 	}
 	
