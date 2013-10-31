@@ -30,6 +30,13 @@ public class InputHandler : MonoBehaviour {
 			Debug.Log (id + " swimmer does not exist in scene");
 		}
 		
+		//TODO: Move this code later
+		var ball = swimmer.transform.Find("BallAnchor/Ball");
+		var ballAnchor = swimmer.transform.Find("BallAnchor");
+		if(ball != null && ballAnchor != null) {
+			ball.rigidbody.detectCollisions = false;
+		}
+		
 		return swimmer;
 	}
 	
@@ -50,11 +57,17 @@ public class InputHandler : MonoBehaviour {
 			return;
 		}
 		
+		//Update velocity
 		var id  = playerIdentifier + swimmerIdentifier;
-		var vector = new Vector3 (
-						Input.GetAxis (id + "Horizontal"),
-						0f,
-						Input.GetAxis  (id + "Vertical"));
+		var vector = new Vector3 (Input.GetAxis (id + "Horizontal"), 0f, Input.GetAxis  (id + "Vertical"));
 		swimmer.rigidbody.velocity = vector * BaseSpeed * Time.deltaTime;
+		
+		//Update rotation
+		var ballAnchor = swimmer.transform.Find("BallAnchor");
+		if(ballAnchor != null) {
+			var newRotationAroundY = Mathf.Rad2Deg * Mathf.Atan2 (-Input.GetAxis (id + "Vertical"), Input.GetAxis (id + "Horizontal"));
+			var newRotation = Quaternion.Euler(new Vector3(0, newRotationAroundY, 0));
+			ballAnchor.rotation = newRotation;
+		}
 	}
 }
