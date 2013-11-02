@@ -82,17 +82,17 @@ public class Swimmer : MonoBehaviour {
 			}
 		}
 	}
-	
 	void UpdateShoot () {
 		if(ball.transform.parent != null && ball.transform.parent.parent != null) {
 			var shootAxisName = playerId + "Shoot";
 			if(Input.GetAxis (shootAxisName) > 0f && (ball.transform.parent.parent == transform || isTouchingBall)) {
+				var ballHolder = ball.transform.parent.parent;
+				ballHolder.gameObject.layer = PlayerLayer;
 				ball.transform.parent = null;
 				ball.rigidbody.isKinematic = false;
 				ball.rigidbody.detectCollisions = true;
 				var force = heading * BaseShootPower;
 				ball.rigidbody.AddForce (force);
-				gameObject.layer = PlayerLayer;
 			}
 		}
 	}
