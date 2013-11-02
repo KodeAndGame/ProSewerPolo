@@ -6,11 +6,13 @@ public class Swimmer : MonoBehaviour {
 	#region Constants
 	private const int PlayerIdentifierLength = 2;
 	private const int LengthOfNameWithoutSwimmerId = 9;
+	private const int PlayerLayer = 9;
+	private const int PlayerHoldingBallLayer = 8;
 	#endregion
 	
 	#region Public Members
 	public float BaseSpeed = 1000f;
-	public float BaseKickPower = 2300f;
+	public float BaseShootPower = 2300f;
 	#endregion
 	
 	#region Private Members
@@ -18,6 +20,7 @@ public class Swimmer : MonoBehaviour {
 	private string swimmerId;
 	private Vector3 heading = new Vector3(1f, 0f, 0f);
 	private GameObject ball;
+	private bool isTouchingBall = false;
 	#endregion
 	
 	#region Unity Hooks
@@ -30,25 +33,33 @@ public class Swimmer : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		UpdateMovement();	
+		UpdateMovement();
+		UpdateShoot ();
 	}
 	
+	//Called when collision occurs
 	void OnCollisionEnter(Collision collision) {
-		if (collision.gameObject.tag == "Ball" && collision.transform.parent == null) {		
-			var ballAnchor = transform.Find("BallAnchor");
-			collision.rigidbody.isKinematic = true;
-			//rigidbody.detectCollisions = false;
-			collision.transform.parent = ballAnchor;
-			collision.transform.localPosition = new Vector3(1f, 0f, 0f);
-			collision.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+		if (collision.gameObject.tag == "Ball") {
+			
+			isTouchingBall = true;
+			
+			if(collision.transform.parent == null) {
+				gameObject.layer = PlayerHoldingBallLayer;
+				var ballAnchor = transform.Find("BallAnchor");
+				collision.rigidbody.isKinematic = true;
+				collision.transform.parent = ballAnchor;
+				collision.transform.localPosition = new Vector3(1f, 0f, 0f);
+				collision.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+			}
 		}
 	}
 	
-	/*
+	//Called when collision case ceases
 	void OnCollisionExit(Collision collision) {
-		Debug.Log ("collision exit");
+		if (collision.gameObject.tag == "Ball") {
+				isTouchingBall = false;
+		}
 	}
-	*/
 	#endregion
 	
 	void UpdateMovement () {
@@ -67,6 +78,20 @@ public class Swimmer : MonoBehaviour {
 				var newRotationAroundY = Mathf.Rad2Deg * Mathf.Atan2 (-Input.GetAxis (id + "Vertical"), Input.GetAxis (id + "Horizontal"));
 				var newRotation = Quaternion.Euler(new Vector3(0, newRotationAroundY, 0));
 				ballAnchor.rotation = newRotation;
+			}
+		}
+	}
+	
+	void UpdateShoot () {
+		if(ball.transform.parent != null && ball.transform.parent.parent != null) {
+			var shootAxisName = playerId + "Shoot";
+			if(Input.GetAxis (shootAxisName) > 0f && (ball.transform.parent.parent == transform || isTouchingBall)) {
+				ball.transform.parent = null;
+				ball.rigidbody.isKinematic = false;
+				ball.rigidbody.detectCollisions = true;
+				var force = heading * BaseShootPower;
+				ball.rigidbody.AddForce (force);
+				gameObject.layer = PlayerLayer;
 			}
 		}
 	}
