@@ -15,6 +15,7 @@ public class Swimmers : MonoBehaviour {
 	private string [] swimmerNames = {"P1LeftSwimmer", "P1RightSwimmer", "P2LeftSwimmer", "P2RightSwimmer"};
 	private GameObject [] swimmers = new GameObject[4];
 	private Vector3 [] swimmerHeadings = new Vector3[4];
+	//private bool [] touchingBall = new bool[4];
 	private GameObject ball;
 	#endregion
 	
@@ -32,6 +33,7 @@ public class Swimmers : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		ForEachSwimmer (UpdateMovement);
+		ForEachSwimmer (UpdateShootBall);
 		PollForReset ();
 	}
 	#endregion
@@ -50,11 +52,7 @@ public class Swimmers : MonoBehaviour {
 	#region Update Functions
 	void PollForReset() {
 		if(Input.GetKeyDown(KeyCode.R)) {
-			ball.transform.position = new Vector3(0f, 0f, 0f);
-			ball.transform.parent = null;
-			ball.rigidbody.isKinematic = false;
-			ball.rigidbody.detectCollisions = true;
-			ball.rigidbody.velocity = Vector3.zero;
+			ResetBall();
 		}
 	}	
 	void UpdateMovement (int i) {
@@ -81,6 +79,17 @@ public class Swimmers : MonoBehaviour {
 			}
 		}
 	}
+	void UpdateShootBall (int i) {
+		var swimmer = swimmers[i];
+		
+		var playerId = ((string)swimmerNames[i]).Substring(0, 2);
+		var shootAxisName = playerId + "Shoot";
+		
+		/*
+		 * if(Input.GetAxis ("Shoot") > 0f && ball.transform.parent != null && ball.collider.) {
+		}
+		*/
+	}
 	#endregion
 	
 	#region Swimmer Helper Functions
@@ -99,6 +108,13 @@ public class Swimmers : MonoBehaviour {
 			Debug.Log (name + " GameObject not found in scene");
 		}
 		return obj;
+	}
+	void ResetBall () {
+		ball.transform.position = Vector3.zero;
+		ball.rigidbody.velocity = Vector3.zero;
+		ball.transform.parent = null;
+		ball.rigidbody.isKinematic = false;
+		ball.rigidbody.detectCollisions = true;
 	}
 	#endregion
 }
