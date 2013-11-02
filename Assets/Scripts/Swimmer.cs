@@ -46,6 +46,7 @@ public class Swimmer : MonoBehaviour {
 			if(collision.transform.parent == null) {
 				gameObject.layer = PlayerHoldingBallLayer;
 				var ballAnchor = transform.Find("BallAnchor");
+				collision.rigidbody.velocity = Vector3.zero;
 				collision.rigidbody.isKinematic = true;
 				collision.transform.parent = ballAnchor;
 				collision.transform.localPosition = new Vector3(1f, 0f, 0f);
