@@ -49,6 +49,14 @@ public class InputHandler : MonoBehaviour {
 	void Update () {
 		UpdateAllMovement ();	
 		HandleShootBall ();
+		
+		if(Input.GetKeyDown(KeyCode.R)) {
+			ball.transform.position = new Vector3(0f, 0f, 0f);
+			ball.transform.parent = null;
+			ball.rigidbody.isKinematic = false;
+			ball.rigidbody.detectCollisions = true;
+			ball.rigidbody.velocity = Vector3.zero;
+		}
 	}
 	
 	void HandleShootBall() {
@@ -60,6 +68,7 @@ public class InputHandler : MonoBehaviour {
 		ball.rigidbody.isKinematic = false;
 		ball.rigidbody.detectCollisions = true;
 		var force = direction * BaseKickPower;
+		//Debug.Log (force);
 		ball.rigidbody.AddForce (force);
 	}
 	
@@ -76,15 +85,20 @@ public class InputHandler : MonoBehaviour {
 		}
 		
 		var id  = playerIdentifier + swimmerIdentifier;
+		//Update velocity
+		var directionalVector = new Vector3 (Input.GetAxis (id + "Horizontal"), 0f, Input.GetAxis  (id + "Vertical"));
+		Debug.Log (directionalVector);
+		swimmer.rigidbody.velocity = directionalVector * BaseSpeed * Time.deltaTime;
+		
 		if(Input.GetAxis (id + "Horizontal") != 0f || Input.GetAxis(id + "Vertical") != 0f) {
-			//Update velocity
-			var directionalVector = new Vector3 (Input.GetAxis (id + "Horizontal"), 0f, Input.GetAxis  (id + "Vertical"));
-			swimmer.rigidbody.velocity = directionalVector * BaseSpeed * Time.deltaTime;
+			
+			
 			
 			//Update rotation
 			var ballAnchor = swimmer.transform.Find("BallAnchor");
 			if(ballAnchor != null) {
 				direction = directionalVector;
+				direction = direction.normalized;
 				var newRotationAroundY = Mathf.Rad2Deg * Mathf.Atan2 (-Input.GetAxis (id + "Vertical"), Input.GetAxis (id + "Horizontal"));
 				var newRotation = Quaternion.Euler(new Vector3(0, newRotationAroundY, 0));
 				ballAnchor.rotation = newRotation;
