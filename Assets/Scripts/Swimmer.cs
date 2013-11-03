@@ -4,8 +4,6 @@ using System.Collections;
 public class Swimmer : MonoBehaviour {
 	
 	#region Constants
-	private const int PlayerIdentifierLength = 2;
-	private const int LengthOfNameWithoutSwimmerId = 9;
 	private const int PlayerLayer = 9;
 	private const int PlayerHoldingBallLayer = 8;
 	#endregion
@@ -13,11 +11,12 @@ public class Swimmer : MonoBehaviour {
 	#region Public Members
 	public float BaseSpeed = 1000f;
 	public float BaseShootPower = 2300f;
+	public string HorizontalAxisName;
+	public string VerticalAxisName;
+	public string ShootAxisName;
 	#endregion
 	
 	#region Private Members
-	private string playerId;
-	private string swimmerId;
 	private Vector3 heading = new Vector3(1f, 0f, 0f);
 	private GameObject ball;
 	private bool isTouchingBall = false;
@@ -26,9 +25,8 @@ public class Swimmer : MonoBehaviour {
 	#region Unity Hooks
 	// Use this for initialization
 	void Start () {
+		AssertValidAxisNames ();
 		ball = GameObject.Find ("Ball");
-		playerId = name.Substring(0, PlayerIdentifierLength);
-		swimmerId = name.Substring (PlayerIdentifierLength, name.Length - LengthOfNameWithoutSwimmerId);
 	}
 	
 	// Update is called once per frame
@@ -63,20 +61,31 @@ public class Swimmer : MonoBehaviour {
 	}
 	#endregion
 	
+	void AssertValidAxisNames() {
+		if(string.IsNullOrEmpty(HorizontalAxisName)) {
+			Debug.LogError("Horizontal Axis Name is missing");
+		}
+		if(string.IsNullOrEmpty(VerticalAxisName)) {
+			Debug.LogError("Vertical Axis Name is missing");
+		}
+		if(string.IsNullOrEmpty(ShootAxisName)) {
+			Debug.LogError("Shoot Axis Name is missing");
+		}
+	}
 	void UpdateMovement () {
-		//Get initial data
-		var id  = playerId + swimmerId;
+		var horizontalInput = Input.GetAxis (HorizontalAxisName);
+		var verticalInput = Input.GetAxis (VerticalAxisName);
 		
 		//Update velocity
-		var userHeading = new Vector3 (Input.GetAxis (id + "Horizontal"), 0f, Input.GetAxis  (id + "Vertical"));
+		var userHeading = new Vector3 (horizontalInput, 0f, verticalInput);
 		rigidbody.velocity = userHeading * BaseSpeed * Time.deltaTime;
 		
 		//Update direction swimmer is facing in	(don't update if neither axis is active)
-		if(Input.GetAxis (id + "Horizontal") != 0f || Input.GetAxis(id + "Vertical") != 0f) {
+		if(horizontalInput != 0f || verticalInput != 0f) {
 			var ballAnchor = transform.Find("BallAnchor");
 			if(ballAnchor != null) {
 				heading = userHeading.normalized;
-				var newRotationAroundY = Mathf.Rad2Deg * Mathf.Atan2 (-Input.GetAxis (id + "Vertical"), Input.GetAxis (id + "Horizontal"));
+				var newRotationAroundY = Mathf.Rad2Deg * Mathf.Atan2 (-verticalInput, horizontalInput);
 				var newRotation = Quaternion.Euler(new Vector3(0, newRotationAroundY, 0));
 				ballAnchor.rotation = newRotation;
 			}
@@ -84,8 +93,7 @@ public class Swimmer : MonoBehaviour {
 	}
 	void UpdateShoot () {
 		if(ball.transform.parent != null && ball.transform.parent.parent != null) {
-			var shootAxisName = playerId + "Shoot";
-			if(Input.GetAxis (shootAxisName) > 0f && (ball.transform.parent.parent == transform || isTouchingBall)) {
+			if(Input.GetAxis (ShootAxisName) > 0f && (ball.transform.parent.parent == transform || isTouchingBall)) {
 				var ballHolder = ball.transform.parent.parent;
 				ballHolder.gameObject.layer = PlayerLayer;
 				ball.transform.parent = null;
