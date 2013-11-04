@@ -5,5 +5,7 @@ Pro Sewer Polo is a game being developed in Unity by the GOTMPodcast.com team fo
 
 Team
 ------
-- **Richard Alvarez**: Programmer
+- **Richard Alvarez**: Project Lead, Programmer
 - **Dan Dwire**: Programmer, Art
+- **Chris Conle**: Programmer
+- **Matt Geiger**: Programmer
