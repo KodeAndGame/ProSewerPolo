@@ -2,8 +2,12 @@
 using System.Collections;
 
 public class Ball : MonoBehaviour {
-	void OnBecameInvisible () {
-		Reset ();
+	private const string ValidPlayZoneTag = "Respawn";
+		
+	void OnTriggerExit (Collider collider) {
+		if(collider.tag == ValidPlayZoneTag) {
+			Reset ();
+		}
 	}
 	void Reset () {
 		if(gameObject.active) {

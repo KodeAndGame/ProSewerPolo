@@ -45,7 +45,7 @@ public class Swimmer : MonoBehaviour {
 				gameObject.layer = PlayerHoldingBallLayer;
 				var ballAnchor = transform.Find("BallAnchor");
 				collision.rigidbody.velocity = Vector3.zero;
-				collision.rigidbody.isKinematic = true;
+				//collision.rigidbody.isKinematic = true;
 				collision.transform.parent = ballAnchor;
 				collision.transform.localPosition = new Vector3(1f, 0f, 0f);
 				collision.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
@@ -97,7 +97,7 @@ public class Swimmer : MonoBehaviour {
 				var ballHolder = ball.transform.parent.parent;
 				ballHolder.gameObject.layer = PlayerLayer;
 				ball.transform.parent = null;
-				ball.rigidbody.isKinematic = false;
+				//ball.rigidbody.isKinematic = false;
 				ball.rigidbody.detectCollisions = true;
 				var force = heading * BaseShootPower;
 				ball.rigidbody.AddForce (force);
