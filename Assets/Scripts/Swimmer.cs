@@ -85,9 +85,9 @@ public class Swimmer : MonoBehaviour {
 			var ballAnchor = transform.Find("BallAnchor");
 			if(ballAnchor != null) {
 				heading = userHeading.normalized;
-				var newRotationAroundY = Mathf.Rad2Deg * Mathf.Atan2 (-verticalInput, horizontalInput);
+				var newRotationAroundY = Mathf.Rad2Deg * Mathf.Atan2 (horizontalInput, verticalInput);
 				var newRotation = Quaternion.Euler(new Vector3(0, newRotationAroundY, 0));
-				ballAnchor.rotation = newRotation;
+				transform.rotation = newRotation;
 			}
 		}
 	}
