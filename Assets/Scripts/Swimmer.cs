@@ -11,9 +11,11 @@ public class Swimmer : MonoBehaviour {
 	#region Public Members
 	public float BaseSpeed = 1000f;
 	public float BaseShootPower = 2300f;
+	public float CatchZoneSize = 1000f;
 	public string HorizontalAxisName;
 	public string VerticalAxisName;
 	public string ShootAxisName;
+	public Swimmer teammate;
 	#endregion
 	
 	#region Private Members
@@ -33,30 +35,36 @@ public class Swimmer : MonoBehaviour {
 	void Update () {
 		UpdateMovement();
 		UpdateShoot ();
+		UpdateCatchSize ();
 	}
 	
-	//Called when collision occurs
-	void OnCollisionEnter(Collision collision) {
-		if (collision.gameObject.tag == "Ball") {
+	//Called when something enters the catch zone
+	void OnTriggerEnter(Collider other) {
+		if (other.gameObject.tag == "Ball") {
 			
-			isTouchingBall = true;
+			isTouchingBall = true;			
 			
-			if(collision.transform.parent == null) {
+			//Caught the ball, so reduce catch size for team
+			CatchZoneSize = 500f;
+			teammate.CatchZoneSize = 500f;
+			
+			if(other.transform.parent == null) {
 				gameObject.layer = PlayerHoldingBallLayer;
+				
 				var ballAnchor = transform.Find("BallAnchor");
-				collision.rigidbody.velocity = Vector3.zero;
-				//collision.rigidbody.isKinematic = true;
-				collision.transform.parent = ballAnchor;
-				collision.transform.localPosition = new Vector3(1f, 0f, 0f);
-				collision.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+				other.rigidbody.velocity = Vector3.zero;
+				//other.rigidbody.isKinematic = true;
+				other.transform.parent = ballAnchor;
+				other.transform.localPosition = new Vector3(1f, 0f, 0f);
+				other.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
 			}
 		}
 	}
 	
-	//Called when collision case ceases
-	void OnCollisionExit(Collision collision) {
-		if (collision.gameObject.tag == "Ball") {
-				isTouchingBall = false;
+	//Called when trigger case ceases
+	void OnTriggerExit(Collider other) {
+		if (other.gameObject.tag == "Ball") {
+			isTouchingBall = false;
 		}
 	}
 	#endregion
@@ -72,6 +80,7 @@ public class Swimmer : MonoBehaviour {
 			Debug.LogError("Shoot Axis Name is missing");
 		}
 	}
+	
 	void UpdateMovement () {
 		var horizontalInput = Input.GetAxis (HorizontalAxisName);
 		var verticalInput = Input.GetAxis (VerticalAxisName);
@@ -80,7 +89,7 @@ public class Swimmer : MonoBehaviour {
 		var userHeading = new Vector3 (horizontalInput, 0f, verticalInput);
 		rigidbody.velocity = userHeading * BaseSpeed * Time.deltaTime;
 		
-		//Update direction swimmer is facing in	(don't update if neither axis is active)
+		//Update direction swimmer is facing (only if either axis is active)
 		if(horizontalInput != 0f || verticalInput != 0f) {
 			var ballAnchor = transform.Find("BallAnchor");
 			if(ballAnchor != null) {
@@ -91,9 +100,17 @@ public class Swimmer : MonoBehaviour {
 			}
 		}
 	}
+	
+	//If something changed the catch size of the swimmer, adjust the collider to match
+	void UpdateCatchSize () {
+		var catcher = gameObject.GetComponent<SphereCollider> ();
+		
+		catcher.radius = CatchZoneSize / 1000f;
+	}
+	
 	void UpdateShoot () {
 		if(ball.transform.parent != null && ball.transform.parent.parent != null) {
-			if(Input.GetAxis (ShootAxisName) > 0f && (ball.transform.parent.parent == transform || isTouchingBall)) {
+			if(Input.GetAxis (ShootAxisName) > 0f && (ball.transform.parent.parent == (transform || isTouchingBall))) {
 				var ballHolder = ball.transform.parent.parent;
 				ballHolder.gameObject.layer = PlayerLayer;
 				ball.transform.parent = null;
@@ -101,6 +118,10 @@ public class Swimmer : MonoBehaviour {
 				ball.rigidbody.detectCollisions = true;
 				var force = heading * BaseShootPower;
 				ball.rigidbody.AddForce (force);
+				
+				//Lost the ball, so enlarge the catch radius
+				CatchZoneSize = 1000f;
+				teammate.CatchZoneSize = 1000f;
 			}
 		}
 	}
