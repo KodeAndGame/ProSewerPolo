@@ -6,12 +6,14 @@ public class Swimmer : MonoBehaviour {
 	#region Constants
 	private const int PlayerLayer = 9;
 	private const int PlayerHoldingBallLayer = 8;
+	private const float PossessSize = 0.5f;
+	private const float LackingSize = 1f;
 	#endregion
 	
 	#region Public Members
 	public float BaseSpeed = 1000f;
 	public float BaseShootPower = 2300f;
-	public float CatchZoneSize = 1000f;
+	public float CatchZoneSize = 1f;
 	public string HorizontalAxisName;
 	public string VerticalAxisName;
 	public string ShootAxisName;
@@ -45,8 +47,7 @@ public class Swimmer : MonoBehaviour {
 			isTouchingBall = true;			
 			
 			//Caught the ball, so reduce catch size for team
-			CatchZoneSize = 500f;
-			teammate.CatchZoneSize = 500f;
+			CatchZoneSize = teammate.CatchZoneSize = PossessSize;
 			
 			if(other.transform.parent == null) {
 				gameObject.layer = PlayerHoldingBallLayer;
@@ -105,12 +106,12 @@ public class Swimmer : MonoBehaviour {
 	void UpdateCatchSize () {
 		var catcher = gameObject.GetComponent<SphereCollider> ();
 		
-		catcher.radius = CatchZoneSize / 1000f;
+		catcher.radius = CatchZoneSize;
 	}
 	
 	void UpdateShoot () {
 		if(ball.transform.parent != null && ball.transform.parent.parent != null) {
-			if(Input.GetAxis (ShootAxisName) > 0f && (ball.transform.parent.parent == (transform || isTouchingBall))) {
+			if(Input.GetAxis (ShootAxisName) > 0f && (ball.transform.parent.parent == transform || isTouchingBall)) {
 				var ballHolder = ball.transform.parent.parent;
 				ballHolder.gameObject.layer = PlayerLayer;
 				ball.transform.parent = null;
@@ -119,9 +120,8 @@ public class Swimmer : MonoBehaviour {
 				var force = heading * BaseShootPower;
 				ball.rigidbody.AddForce (force);
 				
-				//Lost the ball, so enlarge the catch radius
-				CatchZoneSize = 1000f;
-				teammate.CatchZoneSize = 1000f;
+				//Lost the ball, so enlarge the team's catch radius
+				CatchZoneSize = teammate.CatchZoneSize = LackingSize;
 			}
 		}
 	}
