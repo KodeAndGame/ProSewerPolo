@@ -7,5 +7,5 @@ Team
 ------
 - **Richard Alvarez**: Project Lead, Programmer
 - **Dan Dwire**: Programmer, Art
-- **Chris Conle**: Programmer
+- **Chris Conley**: Programmer
 - **Matt Geiger**: Programmer
