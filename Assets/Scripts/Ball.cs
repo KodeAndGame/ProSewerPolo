@@ -9,6 +9,7 @@ public class Ball : MonoBehaviour {
 			Reset ();
 		}
 	}
+
 	public void Reset () {
 		if(gameObject.active) {
 			rigidbody.isKinematic = false;
@@ -19,5 +20,15 @@ public class Ball : MonoBehaviour {
 				transform.parent = null;
 			}
 		}
+	}
+
+	
+	public void Reset () {
+		rigidbody.isKinematic = false;
+		rigidbody.detectCollisions = true;
+		transform.position = Vector3.zero;
+		rigidbody.velocity = Vector3.zero;
+		transform.parent = null;
+
 	}
 }
