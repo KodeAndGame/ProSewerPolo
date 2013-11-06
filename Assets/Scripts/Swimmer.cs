@@ -46,17 +46,17 @@ public class Swimmer : MonoBehaviour {
 			
 			isTouchingBall = true;			
 			
-			
-			var ballSpring = other.GetComponent<SpringJoint>();
-			
-			if(ballSpring.connectedBody == null) {
+			if(other.transform.parent == null || other.transform.parent.tag != "Player") {
+				
 				//Caught the ball, so reduce catch size for team
 				CatchZoneSize = teammate.CatchZoneSize = PossessSize;
 				
 				gameObject.layer = PlayerHoldingBallLayer;
-				other.rigidbody.velocity = Vector3.zero;
-				ballSpring.connectedBody = rigidbody;
-				ballSpring.spring = 55;
+				var ballAnchor = transform.Find ("BallAnchor");
+				other.transform.parent = ballAnchor;
+				other.rigidbody.isKinematic = true;
+ 				other.transform.localPosition = new Vector3(1f, 0f, 0f);
+ 				other.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
 			}
 		}
 	}
@@ -103,29 +103,24 @@ public class Swimmer : MonoBehaviour {
 		var catcher = gameObject.GetComponent<SphereCollider> ();
 		
 		//Adjusts gradually towards CatchZoneSize, asymptotically
-		catcher.radius += (CatchZoneSize - catcher.radius) * 2f * Time.deltaTime;
+		catcher.radius +=(CatchZoneSize - catcher.radius) * 2f * Time.deltaTime;
 	}
 	
+	
 	void UpdateShoot () {
-		
-		if(Input.GetAxis (ShootAxisName) > 0f) {
-			var ballSpring = ball.GetComponent<SpringJoint>();
-			
-			if ((ballSpring.connectedBody != null) && (ballSpring.connectedBody != ball.rigidbody)){
-				var ballHolder = ballSpring.connectedBody.gameObject;
-				
-				//Lost the ball, so enlarge the team's catch radius
-				CatchZoneSize = teammate.CatchZoneSize = LackingSize;
-				
-				ballHolder.gameObject.layer = PlayerLayer;
-				ballSpring.connectedBody = null;
-				
-				//Don't want ball to snap back to us -- undoing a spring joint is not instantaneous
-				ballSpring.spring = 0;
-				
-				var force = heading * BaseShootPower;
-				ball.rigidbody.AddForce (force);
-			}
-		}
-	}
+        if(ball.transform.parent != null && ball.transform.parent.parent != null) {
+            if(Input.GetAxis (ShootAxisName) > 0f && (ball.transform.parent.parent == transform || isTouchingBall)) {
+                var ballHolder = ball.transform.parent.parent;
+                ballHolder.gameObject.layer = PlayerLayer;
+                ball.transform.parent = null;
+                ball.rigidbody.isKinematic = false;
+                ball.rigidbody.detectCollisions = true;
+                var force = heading * BaseShootPower;
+                ball.rigidbody.AddForce (force);
+                
+                //Lost the ball, so enlarge the team's catch radius
+                CatchZoneSize = teammate.CatchZoneSize = LackingSize;
+            }
+        }
+    }
 }

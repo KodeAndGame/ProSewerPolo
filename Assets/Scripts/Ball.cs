@@ -20,9 +20,7 @@ public class Ball : MonoBehaviour {
 		rigidbody.detectCollisions = true;
 		transform.position = Vector3.zero;
 		rigidbody.velocity = Vector3.zero;
-		//transform.parent = null;
-		var spring = GetComponent<SpringJoint>();
-		spring.connectedBody = null;
+		transform.parent = null;
 	}
 	
 }
