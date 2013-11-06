@@ -9,7 +9,7 @@ public class Ball : MonoBehaviour {
 			Reset ();
 		}
 	}
-	void Reset () {
+	public void Reset () {
 		if(gameObject.active) {
 			rigidbody.isKinematic = false;
 			rigidbody.detectCollisions = true;
