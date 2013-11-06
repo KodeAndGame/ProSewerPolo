@@ -43,7 +43,6 @@ public class Swimmer : MonoBehaviour {
 	//Called when something enters the catch zone
 	void OnTriggerEnter(Collider other) {
 		if (other.gameObject.tag == "Ball") {
-			Debug.Log("test");
 			
 			isTouchingBall = true;			
 			
@@ -53,7 +52,7 @@ public class Swimmer : MonoBehaviour {
 			if(ballSpring.connectedBody == null) {
 				//Caught the ball, so reduce catch size for team
 				CatchZoneSize = teammate.CatchZoneSize = PossessSize;
-			
+				
 				gameObject.layer = PlayerHoldingBallLayer;
 				other.rigidbody.velocity = Vector3.zero;
 				ballSpring.connectedBody = rigidbody;
