@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
-public class Goal : MonoBehaviour {
+public class GoalBehavior : MonoBehaviour {
 	
-	public Ball ballObject;
+	public BallBehavior ballObject;
 	
 	void OnTriggerEnter (Collider collider) {
 		if (collider.tag != "Ball")
