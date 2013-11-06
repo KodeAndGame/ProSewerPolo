@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Swimmer : MonoBehaviour {
+public class SwimmerBehavior : MonoBehaviour {
 	
 	#region Constants
 	private const int PlayerLayer = 9;
@@ -16,8 +16,8 @@ public class Swimmer : MonoBehaviour {
 	public string HorizontalAxisName;
 	public string VerticalAxisName;
 	public string ShootAxisName;
-	public Swimmer Teammate;
-	public Ball BallScript;
+	public SwimmerBehavior Teammate;
+	public BallBehavior BallScript;
 	#endregion
 	
 	#region Private Members

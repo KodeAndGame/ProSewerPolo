@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Ball : MonoBehaviour {
+public class BallBehavior : MonoBehaviour {
 	
 	#region Constants
 	private const string ValidPlayZoneTag = "Respawn";
@@ -39,7 +39,7 @@ public class Ball : MonoBehaviour {
 		ReleaseBallFromHolder();	
 	}
 	
-	public void Pickup (Swimmer swimmerScript) {
+	public void Pickup (SwimmerBehavior swimmerScript) {
 	
 		var swimmer  = swimmerScript.gameObject;
 		var ballAnchor = swimmer.transform.Find ("BallAnchor");
@@ -62,7 +62,7 @@ public class Ball : MonoBehaviour {
 	void ReleaseBallFromHolder () {
 		//Handle Ball holder changes
 		if(IsHeldByPlayer) {
-			var swimmerScript = transform.parent.parent.GetComponent("Swimmer") as Swimmer;
+			var swimmerScript = transform.parent.parent.GetComponent("SwimmerBehavior") as SwimmerBehavior;
 			swimmerScript.HandleBallRelease();
 		}
 		transform.parent = null;
