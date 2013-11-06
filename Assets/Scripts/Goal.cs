@@ -11,11 +11,9 @@ public class Goal : MonoBehaviour {
 
 		// Increment variable to keep track of score
 		if (this.tag == "BlueGoal")
-			{}//increment BlueScore
-		
-			
-		else if (this.tag == "RedGoal")
 			{}//increment RedScore
+		else if (this.tag == "RedGoal")
+			{}//increment BlueScore
 		
 		//reset ball
 		ballObject.Reset ();
