@@ -17,13 +17,13 @@ public class Swimmer : MonoBehaviour {
 	public string VerticalAxisName;
 	public string ShootAxisName;
 	public Swimmer Teammate;
-	public GameObject Ball;
+	public Ball BallScript;
 	#endregion
 	
 	#region Private Members
 	private Vector3 _heading = new Vector3(1f, 0f, 0f);	
 	private bool _isTouchingBall = false;
-	private Ball _ballScript;
+	private GameObject _ballObject;
 	#endregion
 	
 	#region Unity Hooks
@@ -31,7 +31,7 @@ public class Swimmer : MonoBehaviour {
 	void Start () {
 		AssertValidAxisNames ();
 		SetCatchZoneSize (LackingCatchZoneSize);
-		_ballScript = Ball.GetComponent ("Ball") as Ball;
+		_ballObject = BallScript.gameObject;
 	}
 	
 	// Update is called once per frame
@@ -42,21 +42,10 @@ public class Swimmer : MonoBehaviour {
 	
 	//Called when something enters the catch zone
 	void OnTriggerEnter(Collider other) {
-		if (other.gameObject.tag == "Ball") {
-			
+		if (other.gameObject.tag == "Ball") {			
 			_isTouchingBall = true;			
-			
-			if(other.transform.parent == null || other.transform.parent.tag != "Player") {
-				
-				//Caught the ball, so change catch size for team
-				SetCatchZoneSize(PossessCatchZoneSize);
-				
-				gameObject.layer = PlayerHoldingBallLayer;
-				var ballAnchor = transform.Find ("BallAnchor");
-				other.transform.parent = ballAnchor;
-				other.rigidbody.isKinematic = true;
- 				other.transform.localPosition = new Vector3(1f, 0f, 0f);
- 				other.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+			if(!BallScript.IsHeldByPlayer) {
+				BallScript.Pickup(this);
 			}
 		}
 	}
@@ -72,6 +61,12 @@ public class Swimmer : MonoBehaviour {
 	#region Public Function
 	public void HandleBallRelease () {
 		gameObject.layer = PlayerLayer;
+		SetCatchZoneSize(LackingCatchZoneSize);
+	}
+	public void HandleBallPickup () {				
+		//Caught the ball, so change catch size for team
+		SetCatchZoneSize(PossessCatchZoneSize);
+		gameObject.layer = PlayerHoldingBallLayer;
 	}
 	
 	public void SetCatchZoneSize (float catchZoneSize) {
@@ -116,13 +111,8 @@ public class Swimmer : MonoBehaviour {
 	}
 
 	void UpdateShoot () {
-        if(Ball.transform.parent != null && Ball.transform.parent.parent != null) {
-            if(Input.GetAxis (ShootAxisName) > 0f && (Ball.transform.parent.parent == transform || _isTouchingBall)) {
-				_ballScript.Shoot (_heading * BaseShootPower);
-                
-                //Lost the ball, so change the team's catch radius
-				SetCatchZoneSize(LackingCatchZoneSize);
-            }
+        if(BallScript.IsHeldByPlayer && Input.GetAxis (ShootAxisName) > 0f && (_ballObject.transform.parent.parent == transform || _isTouchingBall)) {
+			BallScript.Shoot (_heading * BaseShootPower);
         }
     }
 	#endregion

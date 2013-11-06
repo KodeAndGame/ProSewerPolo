@@ -2,9 +2,9 @@
 using System.Collections;
 
 public class Ball : MonoBehaviour {
-	private const string ValidPlayZoneTag = "Respawn";
 	
 	#region Constants
+	private const string ValidPlayZoneTag = "Respawn";
 	private const int PlayerLayer = 9;
 	private const int PlayerHoldingBallLayer = 8;
 	#endregion
@@ -17,7 +17,7 @@ public class Ball : MonoBehaviour {
 	}
 	#endregion
 	
-	#region Public Functions
+	#region Public Functions and Properties
 	public void Reset () {
 		//Handle Ball changes
 		rigidbody.isKinematic = false;
@@ -27,7 +27,7 @@ public class Ball : MonoBehaviour {
 		
 		ReleaseBallFromHolder();
 	}
-	
+
 	public void Shoot (Vector3 force) {	
 		
 		//Handle Ball changes
@@ -38,12 +38,30 @@ public class Ball : MonoBehaviour {
 		//Handle Ball parent changes
 		ReleaseBallFromHolder();	
 	}
+	
+	public void Pickup (Swimmer swimmerScript) {
+	
+		var swimmer  = swimmerScript.gameObject;
+		var ballAnchor = swimmer.transform.Find ("BallAnchor");
+		transform.parent = ballAnchor;
+		rigidbody.isKinematic = true;
+		transform.localPosition = new Vector3(1f, 0f, 0f);
+		transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+		
+		swimmerScript.HandleBallPickup ();
+	}
+	
+	public bool IsHeldByPlayer {
+		get {
+			return (transform.parent != null && transform.parent.parent != null && transform.parent.parent.gameObject.tag == "Player");
+		}
+	}
 	#endregion
 	
 	#region Helpers
 	void ReleaseBallFromHolder () {
 		//Handle Ball holder changes
-		if(transform.parent != null && transform.parent.parent != null && transform.parent.parent.tag == "Player") {
+		if(IsHeldByPlayer) {
 			var swimmerScript = transform.parent.parent.GetComponent("Swimmer") as Swimmer;
 			swimmerScript.HandleBallRelease();
 		}
