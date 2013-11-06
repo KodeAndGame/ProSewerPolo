@@ -109,7 +109,7 @@ public class Swimmer : MonoBehaviour {
 	void UpdateShoot () {
 		var ballSpring = ball.GetComponent<SpringJoint>();
 		
-		if ((ballSpring.connectedBody != ball.rigidbody) && (ballSpring.connectedBody != null)){
+		if ((ballSpring.connectedBody != null) && (ballSpring.connectedBody != ball.rigidbody)){
 			if(Input.GetAxis (ShootAxisName) > 0f) {
 				var ballHolder = ballSpring.connectedBody.gameObject;
 				
