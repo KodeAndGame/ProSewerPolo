@@ -3,6 +3,11 @@ using System.Collections;
 
 public class Ball : MonoBehaviour {
 	private const string ValidPlayZoneTag = "Respawn";
+	
+	#region Constants
+	private const int PlayerLayer = 9;
+	private const int PlayerHoldingBallLayer = 8;
+	#endregion
 		
 	void OnTriggerExit (Collider collider) {
 		if(collider.tag == ValidPlayZoneTag) {
