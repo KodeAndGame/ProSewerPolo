@@ -4,6 +4,7 @@ using System.Collections;
 public class Goal : MonoBehaviour {
 	
 	public Ball ballObject;
+	public Score scoreObject;
 	
 	void OnTriggerEnter (Collider collider) {
 		if (collider.tag != "Ball")
@@ -11,9 +12,10 @@ public class Goal : MonoBehaviour {
 
 		// Increment variable to keep track of score
 		if (this.tag == "BlueGoal")
-			{}//increment RedScore
+			++ scoreObject.redScore;//increment RedScore
+		
 		else if (this.tag == "RedGoal")
-			{}//increment BlueScore
+			++ scoreObject.blueScore;//increment BlueScore
 		
 		//reset ball
 		ballObject.Reset ();
