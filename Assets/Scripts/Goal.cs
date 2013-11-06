@@ -19,11 +19,3 @@ public class Goal : MonoBehaviour {
 		ballObject.Reset ();
 	}
 }
-
-//function Start () {
-
-//}
-
-//function Update () {
-
-//}
