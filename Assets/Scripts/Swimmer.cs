@@ -6,19 +6,20 @@ public class Swimmer : MonoBehaviour {
 	#region Constants
 	private const int PlayerLayer = 9;
 	private const int PlayerHoldingBallLayer = 8;
-	private const float PossessSize = 0.5f;
-	private const float LackingSize = 1f;
 	#endregion
 	
 	#region Public Members
 	public float BaseSpeed = 1000f;
-	public float BaseShootPower = 2300f;
-	public float CatchZoneSize = 1f;
+	public float BaseShootPower = 2300f;	
+	public float PossessCatchZoneSize = 2f;
+	public float LackingCatchZoneSize = .5f;
 	public string HorizontalAxisName;
 	public string VerticalAxisName;
 	public string ShootAxisName;
 	public Swimmer teammate;
 	#endregion
+	
+	public float CatchZoneSize { get;set; }
 	
 	#region Private Members
 	private Vector3 heading = new Vector3(1f, 0f, 0f);
@@ -31,6 +32,9 @@ public class Swimmer : MonoBehaviour {
 	void Start () {
 		AssertValidAxisNames ();
 		ball = GameObject.Find ("Ball");
+		CatchZoneSize = LackingCatchZoneSize;
+		var catcher = gameObject.GetComponent<SphereCollider> ();
+		catcher.radius = CatchZoneSize;
 	}
 	
 	// Update is called once per frame
@@ -49,7 +53,7 @@ public class Swimmer : MonoBehaviour {
 			if(other.transform.parent == null || other.transform.parent.tag != "Player") {
 				
 				//Caught the ball, so reduce catch size for team
-				CatchZoneSize = teammate.CatchZoneSize = PossessSize;
+				CatchZoneSize = teammate.CatchZoneSize = PossessCatchZoneSize;
 				
 				gameObject.layer = PlayerHoldingBallLayer;
 				var ballAnchor = transform.Find ("BallAnchor");
@@ -102,8 +106,14 @@ public class Swimmer : MonoBehaviour {
 	void UpdateCatchSize () {
 		var catcher = gameObject.GetComponent<SphereCollider> ();
 		
+		//TODO: this code doesn't work correctly. It goes towards the CatchZoneSize but 
+		// it doesn't always reach it (gets stuck at .999992 for example). 
+		// A dedicated interpolation function would be better.
+		
 		//Adjusts gradually towards CatchZoneSize, asymptotically
-		catcher.radius +=(CatchZoneSize - catcher.radius) * 2f * Time.deltaTime;
+		//catcher.radius +=(CatchZoneSize - catcher.radius) * 2f * Time.deltaTime;
+		
+		catcher.radius  = CatchZoneSize;
 	}
 	
 	
@@ -119,7 +129,7 @@ public class Swimmer : MonoBehaviour {
                 ball.rigidbody.AddForce (force);
                 
                 //Lost the ball, so enlarge the team's catch radius
-                CatchZoneSize = teammate.CatchZoneSize = LackingSize;
+                CatchZoneSize = teammate.CatchZoneSize = LackingCatchZoneSize;
             }
         }
     }
