@@ -43,17 +43,18 @@ public class Swimmer : MonoBehaviour {
 	//Called when something enters the catch zone
 	void OnTriggerEnter(Collider other) {
 		if (other.gameObject.tag == "Ball") {
+			Debug.Log("test");
 			
 			isTouchingBall = true;			
 			
-			//Caught the ball, so reduce catch size for team
-			CatchZoneSize = teammate.CatchZoneSize = PossessSize;
 			
-			if(other.transform.parent == null) {
+			var ballSpring = other.GetComponent<SpringJoint>();
+			
+			if(ballSpring.connectedBody == null) {
+				//Caught the ball, so reduce catch size for team
+				CatchZoneSize = teammate.CatchZoneSize = PossessSize;
+			
 				gameObject.layer = PlayerHoldingBallLayer;
-				
-				var ballSpring = other.GetComponent<SpringJoint>();
-				
 				other.rigidbody.velocity = Vector3.zero;
 				ballSpring.connectedBody = rigidbody;
 				ballSpring.spring = 55;
@@ -107,10 +108,11 @@ public class Swimmer : MonoBehaviour {
 	}
 	
 	void UpdateShoot () {
-		var ballSpring = ball.GetComponent<SpringJoint>();
 		
-		if ((ballSpring.connectedBody != null) && (ballSpring.connectedBody != ball.rigidbody)){
-			if(Input.GetAxis (ShootAxisName) > 0f) {
+		if(Input.GetAxis (ShootAxisName) > 0f) {
+			var ballSpring = ball.GetComponent<SpringJoint>();
+			
+			if ((ballSpring.connectedBody != null) && (ballSpring.connectedBody != ball.rigidbody)){
 				var ballHolder = ballSpring.connectedBody.gameObject;
 				
 				//Lost the ball, so enlarge the team's catch radius
