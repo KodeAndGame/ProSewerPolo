@@ -29,7 +29,6 @@ public class BallBehavior : MonoBehaviour {
 	}
 
 	public void Shoot (Vector3 force) {	
-		
 		//Handle Ball changes
 		rigidbody.isKinematic = false;
 		rigidbody.detectCollisions = true;
@@ -40,7 +39,6 @@ public class BallBehavior : MonoBehaviour {
 	}
 	
 	public void Pickup (SwimmerBehavior swimmerScript) {
-	
 		var swimmer  = swimmerScript.gameObject;
 		var ballAnchor = swimmer.transform.Find ("BallAnchor");
 		transform.parent = ballAnchor;
