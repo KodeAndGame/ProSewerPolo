@@ -15,7 +15,9 @@ public class SwimmerBehavior : MonoBehaviour {
 	#endregion
 	
 	#region Public Members
-	public float BaseSpeed = 1000f;
+	public float BaseSpeed = 1000f;			//No ball movement speed
+	public float HoldingSpeed = 800f;		//Movement speed when possessing the ball
+	public float CurrentSpeed = 1000f;
 	public float BaseShootPower = 2300f;	
 	public float PossessCatchZoneSize = 2f;
 	public float LackingCatchZoneSize = 1f;
@@ -71,11 +73,14 @@ public class SwimmerBehavior : MonoBehaviour {
 	public void HandleBallRelease () {
 		gameObject.layer = PlayerLayer;
 		SetCatchZoneSize(LackingCatchZoneSize);
+		SetSpeed(BaseSpeed);
 	}
+	
 	public void HandleBallPickup () {				
 		//Caught the ball, so change catch size for team
 		SetCatchZoneSize(PossessCatchZoneSize);
 		gameObject.layer = PlayerHoldingBallLayer;
+		SetSpeed (HoldingSpeed);
 	}
 	
 	public void SetCatchZoneSize (float catchZoneSize) {
@@ -84,6 +89,10 @@ public class SwimmerBehavior : MonoBehaviour {
 		
 		catcher = Teammate.gameObject.GetComponent<SphereCollider> ();
 		catcher.radius = catchZoneSize;
+	}
+	
+	public void SetSpeed (float newSpeed) {
+		CurrentSpeed = newSpeed;
 	}
 	#endregion
 	
@@ -108,7 +117,7 @@ public class SwimmerBehavior : MonoBehaviour {
 		
 		//Update velocity
 		var userHeading = new Vector3 (horizontalInput, 0f, verticalInput);
-		rigidbody.velocity = userHeading * BaseSpeed * Time.deltaTime;
+		rigidbody.velocity = userHeading * CurrentSpeed * Time.deltaTime;
 		
 		//Update direction swimmer is facing (only if either axis is active)
 		if(userHeading != Vector3.zero) {
