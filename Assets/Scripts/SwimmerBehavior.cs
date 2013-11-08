@@ -19,9 +19,11 @@ public class SwimmerBehavior : MonoBehaviour {
 	public float BaseShootPower = 2300f;	
 	public float PossessCatchZoneSize = 2f;
 	public float LackingCatchZoneSize = .75f;
+	public float power;
 	public string HorizontalAxisName;
 	public string VerticalAxisName;
 	public string ShootAxisName;
+	public bool previouslyShooting = false , currentlyShooting = false;
 	public SwimmerBehavior Teammate;
 	public BallBehavior BallScript;
 	#endregion
@@ -120,10 +122,27 @@ public class SwimmerBehavior : MonoBehaviour {
 	}
 
 	void UpdateShoot () {
-        if(BallScript.IsHeldByPlayer && Input.GetAxis (ShootAxisName) > 0f && (_ballObject.transform.parent.parent == transform || _isTouchingBall)) {
-			BallScript.Shoot (_heading * BaseShootPower);
-			SetState (SwimmerState.ShootRecovery);
-        }
+		previouslyShooting = currentlyShooting;
+		currentlyShooting = (Input.GetAxis(ShootAxisName) > 0f);
+		
+		if(previouslyShooting == true && currentlyShooting == false){//SHOOT HER!
+			if(BallScript.IsHeldByPlayer && (_ballObject.transform.parent.parent == transform || _isTouchingBall)) {//make sure a player has the ball
+				power = Time.time - power;//time since button was pressed
+				if(power>2)
+					power = 2;//in case the button was pressed for longer than 2 seconds
+				if(power<1)
+					power = 1;//incase the button was just tapped.
+				power = power/2;//convert to from 0.1 to 1
+				BallScript.Shoot (_heading * (BaseShootPower * power));
+				SetState (SwimmerState.ShootRecovery);
+			}
+		}
+			
+		if(previouslyShooting == false && currentlyShooting == true){//start the timer
+			if(BallScript.IsHeldByPlayer && (_ballObject.transform.parent.parent == transform || _isTouchingBall)) {//make sure a player has the ball
+				power = Time.time;
+			}
+		}
     }
 	
 	void UpdateState () {
