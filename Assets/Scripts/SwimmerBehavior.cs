@@ -15,12 +15,14 @@ public class SwimmerBehavior : MonoBehaviour {
 	#endregion
 	
 	#region Public Members
-	public float BaseSpeed = 1000f;
 	public float MinShootPower = 2300f;
 	public float MaxShootPower = 4600f;
 	public float MaxShootTime = 2f;
+	public float BaseSpeed = 1000f;			//No ball movement speed
+	public float HoldingSpeed = 800f;		//Movement speed when possessing the ball
+	public float CurrentSpeed = 1000f;
 	public float PossessCatchZoneSize = 2f;
-	public float LackingCatchZoneSize = .75f;
+	public float LackingCatchZoneSize = 1f;
 	public string HorizontalAxisName;
 	public string VerticalAxisName;
 	public string ShootAxisName;
@@ -78,11 +80,14 @@ public class SwimmerBehavior : MonoBehaviour {
 	public void HandleBallRelease () {
 		gameObject.layer = PlayerLayer;
 		SetCatchZoneSize(LackingCatchZoneSize);
+		SetSpeed(BaseSpeed);
 	}
+	
 	public void HandleBallPickup () {				
 		//Caught the ball, so change catch size for team
 		SetCatchZoneSize(PossessCatchZoneSize);
 		gameObject.layer = PlayerHoldingBallLayer;
+		SetSpeed (HoldingSpeed);
 	}
 	
 	public void SetCatchZoneSize (float catchZoneSize) {
@@ -91,6 +96,10 @@ public class SwimmerBehavior : MonoBehaviour {
 		
 		catcher = Teammate.gameObject.GetComponent<SphereCollider> ();
 		catcher.radius = catchZoneSize;
+	}
+	
+	public void SetSpeed (float newSpeed) {
+		CurrentSpeed = newSpeed;
 	}
 	#endregion
 	
@@ -115,10 +124,10 @@ public class SwimmerBehavior : MonoBehaviour {
 		
 		//Update velocity
 		var userHeading = new Vector3 (horizontalInput, 0f, verticalInput);
-		rigidbody.velocity = userHeading * BaseSpeed * Time.deltaTime;
+		rigidbody.velocity = userHeading * CurrentSpeed * Time.deltaTime;
 		
 		//Update direction swimmer is facing (only if either axis is active)
-		if(horizontalInput != 0f || verticalInput != 0f) {
+		if(userHeading != Vector3.zero) {
 			_heading = userHeading.normalized;
 			var newRotationAroundY = Mathf.Rad2Deg * Mathf.Atan2 (horizontalInput, verticalInput);
 			var newRotation = Quaternion.Euler(new Vector3(0, newRotationAroundY, 0));
