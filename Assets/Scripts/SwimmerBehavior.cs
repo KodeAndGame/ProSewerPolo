@@ -18,7 +18,7 @@ public class SwimmerBehavior : MonoBehaviour {
 	public float BaseSpeed = 1000f;
 	public float BaseShootPower = 2300f;	
 	public float PossessCatchZoneSize = 2f;
-	public float LackingCatchZoneSize = .75f;
+	public float LackingCatchZoneSize = 1f;
 	public string HorizontalAxisName;
 	public string VerticalAxisName;
 	public string ShootAxisName;
