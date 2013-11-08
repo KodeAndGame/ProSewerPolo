@@ -16,21 +16,26 @@ public class SwimmerBehavior : MonoBehaviour {
 	
 	#region Public Members
 	public float BaseSpeed = 1000f;
-	public float BaseShootPower = 2300f;	
+	public float MinShootPower = 2300f;
+	public float MaxShootPower = 4600f;
+	public float MaxShootTime = 2f;
 	public float PossessCatchZoneSize = 2f;
 	public float LackingCatchZoneSize = .75f;
-	public float power;
 	public string HorizontalAxisName;
 	public string VerticalAxisName;
 	public string ShootAxisName;
-	public bool previouslyShooting = false , currentlyShooting = false;
 	public SwimmerBehavior Teammate;
 	public BallBehavior BallScript;
+	#endregion
+	
+	#region Protected Members
+	protected float ShotTimer;
 	#endregion
 	
 	#region Private Members
 	private Vector3 _heading = new Vector3(1f, 0f, 0f);	
 	private bool _isTouchingBall = false;
+	private bool PreviouslyShooting = false , CurrentlyShooting = false;
 	private GameObject _ballObject;
 	private SwimmerState _state;
 	private float _stateTimer;
@@ -122,25 +127,34 @@ public class SwimmerBehavior : MonoBehaviour {
 	}
 
 	void UpdateShoot () {
-		previouslyShooting = currentlyShooting;
-		currentlyShooting = (Input.GetAxis(ShootAxisName) > 0f);
+		PreviouslyShooting = CurrentlyShooting;
+		CurrentlyShooting = (Input.GetAxis(ShootAxisName) > 0f);
 		
-		if(previouslyShooting == true && currentlyShooting == false){//SHOOT HER!
+		if(PreviouslyShooting == false && CurrentlyShooting == false)//nothing needs to be done
+			return;
+		
+		if(PreviouslyShooting && CurrentlyShooting)//increment shotBar
+			{}
+		
+		if(PreviouslyShooting && CurrentlyShooting == false){//SHOOT HER!
 			if(BallScript.IsHeldByPlayer && (_ballObject.transform.parent.parent == transform || _isTouchingBall)) {//make sure a player has the ball
-				power = Time.time - power;//time since button was pressed
-				if(power>2)
-					power = 2;//in case the button was pressed for longer than 2 seconds
-				if(power<1)
-					power = 1;//incase the button was just tapped.
-				power = power/2;//convert to from 0.1 to 1
-				BallScript.Shoot (_heading * (BaseShootPower * power));
+				
+				ShotTimer = Time.time - ShotTimer;//time since button was pressed
+				if(ShotTimer  > 2)
+					ShotTimer = 2;
+				
+				var shotPower = ShotTimer / MaxShootTime;//% to modify shot speeed 
+				var additionalPowerPool = MaxShootPower - MinShootPower;//amount shot can be modified
+				var additionalPower = additionalPowerPool * shotPower;//power to add
+				var calculatedPower = additionalPower + MinShootPower;//total power
+				BallScript.Shoot (_heading * calculatedPower);
 				SetState (SwimmerState.ShootRecovery);
 			}
 		}
 			
-		if(previouslyShooting == false && currentlyShooting == true){//start the timer
+		if(PreviouslyShooting == false && CurrentlyShooting){//start the timer
 			if(BallScript.IsHeldByPlayer && (_ballObject.transform.parent.parent == transform || _isTouchingBall)) {//make sure a player has the ball
-				power = Time.time;
+				ShotTimer = Time.time;
 			}
 		}
     }
