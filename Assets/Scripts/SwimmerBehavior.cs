@@ -111,7 +111,7 @@ public class SwimmerBehavior : MonoBehaviour {
 		rigidbody.velocity = userHeading * BaseSpeed * Time.deltaTime;
 		
 		//Update direction swimmer is facing (only if either axis is active)
-		if(horizontalInput != 0f || verticalInput != 0f) {
+		if(userHeading != Vector3.zero) {
 			_heading = userHeading.normalized;
 			var newRotationAroundY = Mathf.Rad2Deg * Mathf.Atan2 (horizontalInput, verticalInput);
 			var newRotation = Quaternion.Euler(new Vector3(0, newRotationAroundY, 0));
