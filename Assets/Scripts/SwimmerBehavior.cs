@@ -21,11 +21,16 @@ public class SwimmerBehavior : MonoBehaviour {
 	public float BaseSpeed = 1000f;			//No ball movement speed
 	public float HoldingSpeed = 800f;		//Movement speed when possessing the ball
 	public float CurrentSpeed = 1000f;
+	public float TurboSpeedIncrease = 500f;
 	public float PossessCatchZoneSize = 2f;
 	public float LackingCatchZoneSize = 1f;
+	public float TurboRechargeRate = 1f;//rate at which turbo recharges per frame.
+	public int TurboMaxAmount = 100;
+	public int TurboAmount = 100;
 	public string HorizontalAxisName;
 	public string VerticalAxisName;
 	public string ShootAxisName;
+	public string TurboAxisName;
 	public SwimmerBehavior Teammate;
 	public BallBehavior BallScript;
 	//public GUIBehavior PowerMeter;
@@ -39,9 +44,11 @@ public class SwimmerBehavior : MonoBehaviour {
 	private Vector3 _heading = new Vector3(1f, 0f, 0f);	
 	private bool _isTouchingBall = false;
 	private bool PreviouslyShooting = false , CurrentlyShooting = false;
+	private bool PreviouslyTurbo = false , CurrentlyTurbo = false;
 	private GameObject _ballObject;
 	private SwimmerState _state;
 	private float _stateTimer;
+	private int TurboRechargeCounter;
 	#endregion
 	
 	#region Unity Hooks
@@ -56,6 +63,7 @@ public class SwimmerBehavior : MonoBehaviour {
 	void Update () {
 		UpdateMovement ();
 		UpdateShoot ();
+		UpdateTurbo ();
 		UpdateState ();
 	}
 	
@@ -150,6 +158,9 @@ public class SwimmerBehavior : MonoBehaviour {
 			//}
 		//}
 		
+		if(PreviouslyShooting && CurrentlyShooting)//increment shotBar
+			{return;}
+		
 		if(PreviouslyShooting && CurrentlyShooting == false){//SHOOT HER!
 			if(BallScript.IsHeldByPlayer && (_ballObject.transform.parent.parent == transform || _isTouchingBall)) {//make sure a player has the ball
 				
@@ -164,15 +175,49 @@ public class SwimmerBehavior : MonoBehaviour {
 				BallScript.Shoot (_heading * calculatedPower);
 				SetState (SwimmerState.ShootRecovery);
 				//PowerMeter.ShotPower = 0;
+				
+				return;
 			}
 		}
 			
 		if(PreviouslyShooting == false && CurrentlyShooting){//start the timer
 			if(BallScript.IsHeldByPlayer && (_ballObject.transform.parent.parent == transform || _isTouchingBall)) {//make sure a player has the ball
 				ShotTimer = Time.time;
+				return;
 			}
 		}
     }
+	
+	void UpdateTurbo(){
+		PreviouslyTurbo = CurrentlyTurbo;
+		CurrentlyTurbo = (Input.GetAxis(TurboAxisName) > 0f);
+		
+		if(PreviouslyTurbo == false && CurrentlyTurbo == false){//recharge meter
+			if(TurboRechargeCounter == 10){
+				if(TurboAmount < TurboMaxAmount)
+					++TurboAmount;
+				TurboRechargeCounter = 0;
+			}
+			else
+				++ TurboRechargeCounter;
+			return;
+		}
+		
+		if(TurboAmount != 0 && PreviouslyTurbo && CurrentlyTurbo){//Decrement turbo meter
+			--TurboAmount;
+			return;
+		}
+		
+		if(TurboAmount == 0 || PreviouslyTurbo && CurrentlyTurbo == false){//decrease speed
+			CurrentSpeed = BaseSpeed;
+			return;
+		}
+		
+		if(TurboAmount != 0 && PreviouslyTurbo == false && CurrentlyTurbo){//increase speed.
+			CurrentSpeed = BaseSpeed + TurboSpeedIncrease;
+			return;
+		}
+	}
 	
 	void UpdateState () {
 		switch (_state) {
