@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class BallBehavior : MonoBehaviour {
@@ -26,6 +26,10 @@ public class BallBehavior : MonoBehaviour {
 		rigidbody.velocity = Vector3.zero;
 		
 		ReleaseBallFromHolder();
+		
+		for(var x = 0; x < SwimmerBehavior.allSwimmers.Count; x++) {
+			SwimmerBehavior.allSwimmers[x].Reset();
+		}
 	}
 
 	public void Shoot (Vector3 force) {	
@@ -51,7 +55,9 @@ public class BallBehavior : MonoBehaviour {
 	
 	public bool IsHeldByPlayer {
 		get {
-			return (transform.parent != null && transform.parent.parent != null && transform.parent.parent.gameObject.tag == "Player");
+			return (transform.parent != null &&
+					transform.parent.parent != null &&
+					transform.parent.parent.gameObject.tag == "Player");
 		}
 	}
 	#endregion

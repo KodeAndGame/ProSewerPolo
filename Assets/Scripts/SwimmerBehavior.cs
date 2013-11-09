@@ -1,26 +1,33 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public enum SwimmerState {
-	Neutral,
-	ShootRecovery
+	Neutral,		//Default state
+	ShootRecovery,	//Can't catch
+	BigCatching		//Catch size enlarged -- to aid passing
 }
 
 public class SwimmerBehavior : MonoBehaviour {
 	
+	#region Static
+	public static  List<SwimmerBehavior> allSwimmers;
+	#endregion
+	
 	#region Constants
 	private const int PlayerLayer = 9;
 	private const int PlayerHoldingBallLayer = 8;
-	private const float ShootRecoveryStateTime = .5f;
+	private const float ShootRecoveryStateTime = .5f;	//Time to catch again after shooting
+	private const float CatchableTime = 2f;				//Time teammate/you have an enlarged catch zone
 
 	private const float MinShootPower = 2300f;
 	private const float MaxShootPower = 4600f;
 	private const float MaxShootTime = 2f;
-	private const float BaseSpeed = 1000f;			//No ball movement speed
-	private const float HoldingSpeed = 800f;		//Movement speed when possessing the ball
+	private const float BaseSpeed = 1000f;			//Ball-less movement speed
+	private const float HoldingSpeed = 800f;		//Movement speed with the ball
 	
-	private const float PossessCatchZoneSize = 2f;
-	private const float LackingCatchZoneSize = 1f;
+	private const float PassingZoneSize = 2f;
+	private const float DefaultZoneSize = 1f;
 	#endregion
 	
 	#region Public Members
@@ -34,6 +41,7 @@ public class SwimmerBehavior : MonoBehaviour {
 	
 	#region Protected Members
 	protected float ShotTimer;
+	protected float CatchableTimer;
 	#endregion
 	
 	#region Private Members
@@ -49,8 +57,13 @@ public class SwimmerBehavior : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		AssertValidAxisNames ();
-		SetCatchZoneSize (LackingCatchZoneSize);
+		SetCatchZoneSize (DefaultZoneSize);
 		_ballObject = BallScript.gameObject;
+		
+		if(allSwimmers == null) {
+			allSwimmers = new List<SwimmerBehavior> (); 
+		}
+		allSwimmers.Add (this);
 	}
 	
 	// Update is called once per frame
@@ -64,7 +77,7 @@ public class SwimmerBehavior : MonoBehaviour {
 	void OnTriggerEnter(Collider other) {
 		if (other.gameObject.tag == "Ball") {			
 			_isTouchingBall = true;			
-			if(!BallScript.IsHeldByPlayer && _state == SwimmerState.Neutral) {
+			if(!BallScript.IsHeldByPlayer && _state != SwimmerState.ShootRecovery) {
 				BallScript.Pickup(this);
 			}
 		}
@@ -81,27 +94,37 @@ public class SwimmerBehavior : MonoBehaviour {
 	#region Public Function
 	public void HandleBallRelease () {
 		gameObject.layer = PlayerLayer;
-		SetCatchZoneSize(LackingCatchZoneSize);
+		Teammate.SetCatchZoneSize(PassingZoneSize);
 		SetSpeed(BaseSpeed);
 	}
 	
 	public void HandleBallPickup () {				
-		//Caught the ball, so change catch size for team
-		SetCatchZoneSize(PossessCatchZoneSize);
+		//Caught the ball, so change catch size for all
+		for(var x = 0; x < allSwimmers.Count; x++) {
+			allSwimmers[x].Reset();
+		}
+		
 		gameObject.layer = PlayerHoldingBallLayer;
 		SetSpeed (HoldingSpeed);
 	}
 	
-	public void SetCatchZoneSize (float catchZoneSize) {
-		var catcher = gameObject.GetComponent<SphereCollider> ();		
-		catcher.radius  = catchZoneSize;
-		
-		catcher = Teammate.gameObject.GetComponent<SphereCollider> ();
-		catcher.radius = catchZoneSize;
+	public void SetCatchZoneSize (float newSize) {
+		var catcher = GetComponent<SphereCollider> ();
+		catcher.radius = newSize;
 	}
 	
 	public void SetSpeed (float newSpeed) {
 		CurrentSpeed = newSpeed;
+	}
+	
+	public void PrepareToCatch () {
+		SetState(SwimmerState.BigCatching);
+	}
+	
+	public void Reset () {
+		SetState(SwimmerState.Neutral);
+		SetCatchZoneSize( DefaultZoneSize );
+		_stateTimer = 0f;
 	}
 	#endregion
 	
@@ -158,8 +181,10 @@ public class SwimmerBehavior : MonoBehaviour {
 				var additionalPowerPool = MaxShootPower - MinShootPower;//amount shot can be modified
 				var additionalPower = additionalPowerPool * shotPower;//power to add
 				var calculatedPower = additionalPower + MinShootPower;//total power
+				
 				BallScript.Shoot (_heading * calculatedPower);
 				SetState (SwimmerState.ShootRecovery);
+				Teammate.PrepareToCatch();
 			}
 		}
 			
@@ -180,7 +205,10 @@ public class SwimmerBehavior : MonoBehaviour {
 		}
 		
 		if(_stateTimer <= 0f) {
-			SetState (SwimmerState.Neutral);
+			if (_state == SwimmerState.ShootRecovery)
+				SetState (SwimmerState.BigCatching);
+			else
+				SetState (SwimmerState.Neutral);
 		}
 	}
 	#endregion
@@ -191,11 +219,13 @@ public class SwimmerBehavior : MonoBehaviour {
 		_state = state;
 		switch (state) {
 		case SwimmerState.ShootRecovery:
-			var catcher = gameObject.GetComponent<SphereCollider> ();		
-			catcher.radius  = 0;
+			SetCatchZoneSize(0f);
 			_stateTimer = ShootRecoveryStateTime;
 			break;
-		case SwimmerState.Neutral:
+		case SwimmerState.BigCatching:
+			SetCatchZoneSize(PassingZoneSize);
+			_stateTimer = CatchableTime;
+			break;
 		default:
 			_stateTimer = 0f;
 			break;
@@ -203,8 +233,8 @@ public class SwimmerBehavior : MonoBehaviour {
 	}
 	
 	void ReleaseState (SwimmerState state) {
-		var catcher = gameObject.GetComponent<SphereCollider> ();		
-		catcher.radius  = LackingCatchZoneSize;
+		SetCatchZoneSize( DefaultZoneSize );
+		
 		_stateTimer = 0f;
 	}
 }
