@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class ScoreBehavior : MonoBehaviour {
+public class GUIBehavior : MonoBehaviour {
 	
 	public GUIStyle BlueScoreStyle;
 	public GUIStyle RedScoreStyle;
@@ -23,6 +23,5 @@ public class ScoreBehavior : MonoBehaviour {
 		
 		GUI.Label(new Rect(10, 10, 100, 100), blueScore.ToString(), BlueScoreStyle);//blueScore
 		GUI.Label(new Rect(Screen.width - 115, 10, 100, 100), redScore.ToString(), RedScoreStyle);//redScore
-		
-	}
+	}	
 }

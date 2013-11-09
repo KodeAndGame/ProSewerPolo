@@ -33,6 +33,7 @@ public class SwimmerBehavior : MonoBehaviour {
 	public string TurboAxisName;
 	public SwimmerBehavior Teammate;
 	public BallBehavior BallScript;
+	//public GUIBehavior PowerMeter;
 	#endregion
 	
 	#region Protected Members
@@ -150,6 +151,13 @@ public class SwimmerBehavior : MonoBehaviour {
 		if(PreviouslyShooting == false && CurrentlyShooting == false)//nothing needs to be done
 			return;
 		
+		//if(PreviouslyShooting && CurrentlyShooting){//increment shotBar
+			//if(BallScript.IsHeldByPlayer && (_ballObject.transform.parent.parent == transform || _isTouchingBall)) {//make sure a player has the ball
+				//if(PowerMeter.ShotPower < MaxShootTime * 60)//for 60fps
+					//++ PowerMeter.ShotPower;
+			//}
+		//}
+		
 		if(PreviouslyShooting && CurrentlyShooting)//increment shotBar
 			{return;}
 		
@@ -166,6 +174,8 @@ public class SwimmerBehavior : MonoBehaviour {
 				var calculatedPower = additionalPower + MinShootPower;//total power
 				BallScript.Shoot (_heading * calculatedPower);
 				SetState (SwimmerState.ShootRecovery);
+				//PowerMeter.ShotPower = 0;
+				
 				return;
 			}
 		}

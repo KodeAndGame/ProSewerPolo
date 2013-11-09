@@ -4,7 +4,7 @@ using System.Collections;
 public class GoalBehavior : MonoBehaviour {
 	
 	public BallBehavior ballObject;
-	public ScoreBehavior scoreObject;
+	public GUIBehavior scoreObject;
 	
 	void OnTriggerEnter (Collider collider) {
 		if (collider.tag != "Ball")
