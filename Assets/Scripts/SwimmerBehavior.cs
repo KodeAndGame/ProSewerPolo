@@ -12,17 +12,19 @@ public class SwimmerBehavior : MonoBehaviour {
 	private const int PlayerLayer = 9;
 	private const int PlayerHoldingBallLayer = 8;
 	private const float ShootRecoveryStateTime = .5f;
+
+	private const float MinShootPower = 2300f;
+	private const float MaxShootPower = 4600f;
+	private const float MaxShootTime = 2f;
+	private const float BaseSpeed = 1000f;			//No ball movement speed
+	private const float HoldingSpeed = 800f;		//Movement speed when possessing the ball
+	
+	private const float PossessCatchZoneSize = 2f;
+	private const float LackingCatchZoneSize = 1f;
 	#endregion
 	
 	#region Public Members
-	public float MinShootPower = 2300f;
-	public float MaxShootPower = 4600f;
-	public float MaxShootTime = 2f;
-	public float BaseSpeed = 1000f;			//No ball movement speed
-	public float HoldingSpeed = 800f;		//Movement speed when possessing the ball
 	public float CurrentSpeed = 1000f;
-	public float PossessCatchZoneSize = 2f;
-	public float LackingCatchZoneSize = 1f;
 	public string HorizontalAxisName;
 	public string VerticalAxisName;
 	public string ShootAxisName;
