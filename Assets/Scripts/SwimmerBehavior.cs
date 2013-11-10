@@ -17,33 +17,43 @@ public class SwimmerBehavior : MonoBehaviour {
 	#region Constants
 	private const int PlayerLayer = 9;
 	private const int PlayerHoldingBallLayer = 8;
-	private const float ShootRecoveryStateTime = .5f;	//Time to catch again after shooting
-	private const float CatchableTime = 2f;				//Time teammate/you have an enlarged catch zone
-
-	private const float MinShootPower = 2300f;
-	private const float MaxShootPower = 4600f;
-	private const float MaxShootTime = 2f;
-	private const float BaseSpeed = 1000f;			//Ball-less movement speed
-	private const float HoldingSpeed = 800f;		//Movement speed with the ball
-	
-	private const float PassingZoneSize = 2f;
-	private const float DefaultZoneSize = 1f;
 	#endregion
 	
 	#region Public Members
-	public float CurrentSpeed = 1000f;
+	//Shooting variables
+	public float _minShootPower2 = 2300f;
+	public float MaxShootPower = 4600f;
+	public float MaxShootTime = 2f;
+	
+	//Speed variables
+	public float BaseSpeed = 1000f;			//Ball-less movement speed
+	public float HoldingSpeed = 800f;		//Movement speed with the ball
 	public float TurboSpeedIncrease = 500f;
-	public float PossessCatchZoneSize = 2f;
-	public float LackingCatchZoneSize = 1f;
-	public float TurboRechargeRate = 1f;//rate at which turbo recharges per frame.
+	
+	//Turbo variables
 	public int TurboMaxAmount = 100;
-	public int TurboAmount = 100;
+	
+	//Catching variables
+	public float PassingZoneSize = 2f;
+	public float DefaultZoneSize = 1f;
+	public float ShootRecoveryStateTime = .5f;	//Time to catch again after shooting
+	public float CatchableTime = 2f;				//Time teammate/you have an enlarged catch zone
+	
+	//Input names
 	public string HorizontalAxisName;
 	public string VerticalAxisName;
 	public string ShootAxisName;
 	public string TurboAxisName;
+	
+	//Object references
 	public SwimmerBehavior Teammate;
 	public BallBehavior BallScript;
+	
+	//TODO: These should probably be moved away from the regular public members.
+	// I don't intend for these to be modified via GUI.
+	public float CurrentSpeed = 1000f;
+	public int TurboAmount = 100;
+	
 	//public GUIBehavior PowerMeter;
 	#endregion
 	
@@ -196,9 +206,9 @@ public class SwimmerBehavior : MonoBehaviour {
 					ShotTimer = 2;
 				
 				var shotPower = ShotTimer / MaxShootTime;//% to modify shot speeed 
-				var additionalPowerPool = MaxShootPower - MinShootPower;//amount shot can be modified
+				var additionalPowerPool = MaxShootPower - _minShootPower2;//amount shot can be modified
 				var additionalPower = additionalPowerPool * shotPower;//power to add
-				var calculatedPower = additionalPower + MinShootPower;//total power
+				var calculatedPower = additionalPower + _minShootPower2;//total power
 				
 				BallScript.Shoot (_heading * calculatedPower);
 				SetState (SwimmerState.ShootRecovery);
