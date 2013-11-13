@@ -166,7 +166,7 @@ ModelImporter:
       loopBlendOrientation: 0
       loopBlendPositionY: 0
       loopBlendPositionXZ: 0
-      keepOriginalOrientation: 0
+      keepOriginalOrientation: 1
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 0
       heightFromFeet: 0
@@ -204,7 +204,7 @@ ModelImporter:
       level: 0
       cycleOffset: 0
       loop: 0
-      loopBlend: 0
+      loopBlend: 1
       loopBlendOrientation: 0
       loopBlendPositionY: 0
       loopBlendPositionXZ: 0
@@ -229,7 +229,7 @@ ModelImporter:
       loopBlendOrientation: 0
       loopBlendPositionY: 0
       loopBlendPositionXZ: 0
-      keepOriginalOrientation: 0
+      keepOriginalOrientation: 1
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 0
       heightFromFeet: 0
@@ -479,7 +479,7 @@ ModelImporter:
         max: {x: 0, y: 20, z: 50}
         value: {x: .0551871806, y: 0, z: .0275935903}
         preQ: {x: .253209382, y: .749738693, z: .609188318, w: -.0516361631}
-        postQ: {x: 4.96814027e-06, y: .953144133, z: .302516311, w: -5.30913894e-07}
+        postQ: {x: 4.96068924e-06, y: .953144073, z: .302516252, w: -5.23462347e-07}
         length: .0689839944
         modified: 1
     - boneName: Bip001 L Finger01
@@ -488,8 +488,8 @@ ModelImporter:
         min: {x: 0, y: 0, z: -45}
         max: {x: 0, y: 0, z: 45}
         value: {x: .0413903818, y: 0, z: .0206951909}
-        preQ: {x: .294455826, y: .921053231, z: .237112716, w: -.0934559777}
-        postQ: {x: -.0337016135, y: .933980823, z: .355625242, w: -.00863670651}
+        preQ: {x: .294455826, y: .921053231, z: .237112686, w: -.0934559628}
+        postQ: {x: -.0337016247, y: .933980882, z: .355625212, w: -.00863669068}
         length: .051737994
         modified: 1
     - boneName: Bip001 L Finger1
@@ -519,7 +519,7 @@ ModelImporter:
         max: {x: 0, y: 20, z: 50}
         value: {x: .0551873781, y: 0, z: .027593689}
         preQ: {x: -.0516352281, y: .609188318, z: .749739468, w: .253207028}
-        postQ: {x: 5.58793602e-07, y: -.302516937, z: -.953143954, w: -1.68755673e-06}
+        postQ: {x: 5.51343021e-07, y: -.302516907, z: -.953143954, w: -1.68010615e-06}
         length: .0689842403
         modified: 1
     - boneName: Bip001 R Finger01
@@ -528,8 +528,8 @@ ModelImporter:
         min: {x: 0, y: 0, z: -45}
         max: {x: 0, y: 0, z: 45}
         value: {x: .0413905308, y: 0, z: .0206952654}
-        preQ: {x: -.0934560299, y: .237113163, z: .921054184, w: .294452637}
-        postQ: {x: .00863574445, y: -.355626017, z: -.933980465, w: .0337040015}
+        preQ: {x: -.093456015, y: .237113133, z: .921054184, w: .294452637}
+        postQ: {x: .00863572955, y: -.355625987, z: -.933980465, w: .0337040052}
         length: .0517381802
         modified: 1
     - boneName: Bip001 R Finger1
@@ -660,7 +660,7 @@ ModelImporter:
       transformModified: 1
     - name: Bip001 L Finger0
       position: {x: -.044382818, y: .0290428754, z: -.0430114865}
-      rotation: {x: .39265278, y: -.0782045349, z: -.0100499401, w: .916300535}
+      rotation: {x: .39265281, y: -.0782045275, z: -.0100499392, w: .916300535}
       scale: {x: 1.00000048, y: 1.00000048, z: 1.00000024}
       transformModified: 1
     - name: Bip001 L Finger01
@@ -690,7 +690,7 @@ ModelImporter:
       transformModified: 1
     - name: Bip001 R Clavicle
       position: {x: .113033652, y: 5.61211709e-05, z: -.0603971891}
-      rotation: {x: -.6867733, y: 1.01327885e-06, z: -.72687155, w: 9.23872051e-07}
+      rotation: {x: -.6867733, y: 1.01327885e-06, z: -.72687155, w: 9.23872165e-07}
       scale: {x: .999999881, y: 1.00000024, z: 1.00000024}
       transformModified: 1
     - name: Bip001 R UpperArm
@@ -710,7 +710,7 @@ ModelImporter:
       transformModified: 1
     - name: Bip001 R Finger0
       position: {x: -.0443827435, y: .0290428586, z: .0430118367}
-      rotation: {x: -.392652601, y: .0782039389, z: -.0100505063, w: .916300654}
+      rotation: {x: -.392652631, y: .0782039315, z: -.0100505054, w: .916300654}
       scale: {x: 1.00000024, y: 1.00000012, z: 1}
       transformModified: 1
     - name: Bip001 R Finger01
