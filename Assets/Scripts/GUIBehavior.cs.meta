@@ -2,7 +2,11 @@ fileFormatVersion: 2
 guid: 65dcb4a294695e44b95c3afd3fc48197
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - Swimmer1: {instanceID: 0}
+  - Swimmer2: {fileID: 100000, guid: efbf312bc31b21940b5fe814755c58da, type: 2}
+  - Swimmer3: {instanceID: 0}
+  - Swimmer4: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
