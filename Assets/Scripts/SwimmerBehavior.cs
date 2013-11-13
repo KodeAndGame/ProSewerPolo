@@ -14,9 +14,14 @@ public class SwimmerBehavior : MonoBehaviour {
 	public static  List<SwimmerBehavior> allSwimmers;
 	#endregion
 	
+	#region Protected
+	protected Animator _animator;
+	#endregion
+	
 	#region Constants
 	private const int PlayerLayer = 9;
 	private const int PlayerHoldingBallLayer = 8;
+	private const float HeadingMultiplier = 0.025f;
 	#endregion
 	
 	#region Public Members
@@ -51,8 +56,8 @@ public class SwimmerBehavior : MonoBehaviour {
 	
 	//TODO: These should probably be moved away from the regular public members.
 	// I don't intend for these to be modified via GUI.
-	public float CurrentSpeed = 1000f;
-	public int TurboAmount = 100;
+	public float CurrentSpeed = 10;
+	public int TurboAmount = 10;
 	
 	//public GUIBehavior PowerMeter;
 	#endregion
@@ -63,7 +68,14 @@ public class SwimmerBehavior : MonoBehaviour {
 	#endregion
 	
 	#region Private Members
-	private Vector3 _heading = new Vector3(1f, 0f, 0f);	
+	private Vector3 _heading = new Vector3(0f, 0f, 0f);	
+	private Vector3 _targetHeading = new Vector3(0f, 0f, 0f);
+	private Vector3 _headingDelta = new Vector3(0f, 0f, 0f);
+	private float _animDirection;
+	private float _animSpeed;
+	
+	int directionHash, speedHash, doFlipHash;
+	
 	private bool _isTouchingBall = false;
 	private bool PreviouslyShooting = false , CurrentlyShooting = false;
 	private bool PreviouslyTurbo = false , CurrentlyTurbo = false;
@@ -84,6 +96,12 @@ public class SwimmerBehavior : MonoBehaviour {
 			allSwimmers = new List<SwimmerBehavior> (); 
 		}
 		allSwimmers.Add (this);
+		
+		_animator = GetComponentInChildren<Animator>();
+		
+		directionHash = Animator.StringToHash("Direction");
+		speedHash = Animator.StringToHash("Speed");
+	    doFlipHash = Animator.StringToHash("DoFlip");
 	}
 	
 	// Update is called once per frame
@@ -170,15 +188,41 @@ public class SwimmerBehavior : MonoBehaviour {
 		
 		//Update velocity
 		var userHeading = new Vector3 (horizontalInput, 0f, verticalInput);
-		rigidbody.velocity = userHeading * CurrentSpeed * Time.deltaTime;
+		_targetHeading = userHeading;
 		
-		//Update direction swimmer is facing (only if either axis is active)
-		if(userHeading != Vector3.zero) {
-			_heading = userHeading.normalized;
-			var newRotationAroundY = Mathf.Rad2Deg * Mathf.Atan2 (horizontalInput, verticalInput);
-			var newRotation = Quaternion.Euler(new Vector3(0, newRotationAroundY, 0));
-			transform.rotation = newRotation;
+		_headingDelta = _targetHeading - _heading;
+		_heading = _heading + (_headingDelta * HeadingMultiplier);
+		
+		rigidbody.velocity = _heading * CurrentSpeed;
+		
+		
+		
+		
+		
+		// aniation controller parameters
+		_animDirection = Vector3.Cross(_heading, _targetHeading).y;
+		_animSpeed = rigidbody.velocity.magnitude;
+		
+		
+		
+		
+		if (Vector3.Dot(_heading, _targetHeading) < -0.3f ) {
+			//_animator.SetBool(doFlipHash, true);
+			
 		}
+		else {
+			_animator.SetBool(doFlipHash, false);
+			//Update direction swimmer is facing (only if either axis is active)
+			if(userHeading != Vector3.zero) {
+				//_heading = userHeading.normalized;
+				var newRotationAroundY = Mathf.Rad2Deg * Mathf.Atan2 (_heading.x, _heading.z);
+				var newRotation = Quaternion.Euler(new Vector3(0, newRotationAroundY, 0));
+				transform.rotation = newRotation;
+			}
+		}
+		
+		_animator.SetFloat(directionHash, _animDirection);
+		_animator.SetFloat(speedHash, _animSpeed);
 	}
 
 	void UpdateShoot () {
