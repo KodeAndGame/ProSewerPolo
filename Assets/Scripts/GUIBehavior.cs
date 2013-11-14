@@ -29,13 +29,17 @@ public class GUIBehavior : MonoBehaviour {
 	
 	void MainMenu(){
 		if (GUI.Button(new Rect(ScreenWidth/4, ScreenHeight/4, ScreenWidth/6, ScreenWidth/6),"Start Game", MenuStyle))
-			GameReset();//Use Application.LoadLevel()?
-		if (GUI.Button(new Rect((ScreenWidth/4)+ScreenWidth/3, Screen.height/4, ScreenWidth/6, ScreenWidth/6),"Quit", MenuStyle))
+			GameReset();
+		if (GUI.Button(new Rect((ScreenWidth/4)+ScreenWidth/3, Screen.height/4, ScreenWidth/6, ScreenWidth/6),"Quit", MenuStyle)){
 			Application.Quit();
+			#if UNITY_EDITOR
+    			UnityEditor.EditorApplication.isPlaying = false;
+			#endif
+		}
 	}
 	
 	void GameReset(){
-		RedScore = BlueScore = 0;
+		Application.LoadLevel(0);
 	}
 	
 }
