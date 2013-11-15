@@ -57,7 +57,7 @@ public class SwimmerBehavior : MonoBehaviour {
 	//TODO: These should probably be moved away from the regular public members.
 	// I don't intend for these to be modified via GUI.
 	public float CurrentSpeed = 10;
-	public int TurboAmount = 10;
+	public int TurboAmount = 100;
 	
 	//public GUIBehavior PowerMeter;
 	#endregion
