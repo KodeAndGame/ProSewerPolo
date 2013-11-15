@@ -11,10 +11,10 @@ public class BallBehavior : MonoBehaviour {
 	
 	#region Unity Event Handlers
 	void OnTriggerExit (Collider collider) {
-		if(collider.tag == ValidPlayZoneTag) {
-			Reset ();
-		}
-	}
+        if(collider.tag == ValidPlayZoneTag && !collider.GetComponent<BoxCollider>().bounds.Contains(transform.position)) {
+            Reset ();
+        }
+    }
 	#endregion
 	
 	#region Public Functions and Properties
