@@ -5,6 +5,7 @@ public class GoalBehavior : MonoBehaviour {
 	
 	public BallBehavior ballObject;
 	public GUIBehavior scoreObject;
+	public AudioClip AirHorn;
 	
 	void OnTriggerEnter (Collider collider) {
 		if (collider.tag != "Ball")
@@ -17,7 +18,11 @@ public class GoalBehavior : MonoBehaviour {
 		else if (this.tag == "RedGoal")
 			++ scoreObject.blueScore;//increment BlueScore
 		
+		AudioSource.PlayClipAtPoint(AirHorn, Camera.main.transform.position);
+		
+		yield return new WaitForSeconds (1);//to make it seems a bit less like magic
+		
 		//reset ball
-		ballObject.Reset ();
+		ballObject.Reset ();//reset ball
 	}
 }
