@@ -132,9 +132,11 @@ public class SwimmerBehavior : MonoBehaviour {
 	
 	#region Public Function
 	public void HandleBallRelease () {
+		
 		gameObject.layer = PlayerLayer;
 		Teammate.SetCatchZoneSize(PassingZoneSize);
 		SetSpeed(BaseSpeed);
+		SetState (SwimmerState.ShootRecovery);
 	}
 	
 	public void HandleBallPickup () {				
@@ -264,10 +266,8 @@ public class SwimmerBehavior : MonoBehaviour {
 		}
 			
 		if(PreviouslyShooting == false && CurrentlyShooting){//start the timer
-			if(BallScript.IsHeldByPlayer && (_ballObject.transform.parent.parent == transform || _isTouchingBall)) {//make sure a player has the ball
-				ShotTimer = Time.time;
-				return;
-			}
+			ShotTimer = Time.time;
+			return;
 		}
     }
 	
