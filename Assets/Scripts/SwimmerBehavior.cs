@@ -341,7 +341,7 @@ public class SwimmerBehavior : MonoBehaviour {
 	
 	void ReleaseState (SwimmerState state) {
 		SetCatchZoneSize( DefaultZoneSize );
-		
+		SetSpeed (BaseSpeed);
 		_stateTimer = 0f;
 	}
 }
