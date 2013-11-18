@@ -9,7 +9,12 @@ public class BallBehavior : MonoBehaviour {
 	private const int PlayerHoldingBallLayer = 8;
 	#endregion
 	
+	private RespawnBehavior respawn;	
+	
 	#region Unity Event Handlers
+	void Start () {
+		respawn = GetComponent("RespawnBehavior") as RespawnBehavior;
+	}
 	void OnTriggerExit (Collider collider) {
         if(collider.tag == ValidPlayZoneTag && !collider.GetComponent<BoxCollider>().bounds.Contains(transform.position)) {
             Reset ();
@@ -17,12 +22,15 @@ public class BallBehavior : MonoBehaviour {
     }
 	#endregion
 	
+	
+	
 	#region Public Functions and Properties
 	public void Reset () {
 		//Handle Ball changes
 		rigidbody.isKinematic = false;
 		rigidbody.detectCollisions = true;
-		transform.position = Vector3.zero;
+		var newPosition = respawn.Respawn ();
+		transform.position = new Vector3(newPosition.x, 0, newPosition.y);
 		rigidbody.velocity = Vector3.zero;
 		
 		ReleaseBallFromHolder();
