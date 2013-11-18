@@ -137,6 +137,12 @@ public class SwimmerBehavior : MonoBehaviour {
 		Teammate.SetCatchZoneSize(PassingZoneSize);
 		SetSpeed(BaseSpeed);
 		SetState (SwimmerState.ShootRecovery);
+		
+		var capsule = GetComponent<CapsuleCollider>();
+		capsule.radius = .5f;
+		var center = capsule.center;
+		center.z = 0f;
+		capsule.center = center;
 	}
 	
 	public void HandleBallPickup () {				
@@ -147,6 +153,12 @@ public class SwimmerBehavior : MonoBehaviour {
 		
 		gameObject.layer = PlayerHoldingBallLayer;
 		SetSpeed (HoldingSpeed);
+		
+		var capsule = GetComponent<CapsuleCollider>();
+		capsule.radius = 1f;
+		var center = capsule.center;
+		center.z = .4f;
+		capsule.center = center;
 	}
 	
 	public void SetCatchZoneSize (float newSize) {

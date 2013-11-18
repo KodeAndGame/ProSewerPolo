@@ -39,7 +39,7 @@ public class BallBehavior : MonoBehaviour {
 		rigidbody.AddForce(force);
 		
 		//Handle Ball parent changes
-		ReleaseBallFromHolder();	
+		ReleaseBallFromHolder();
 	}
 	
 	public void Pickup (SwimmerBehavior swimmerScript) {
@@ -47,6 +47,8 @@ public class BallBehavior : MonoBehaviour {
 		var ballAnchor = swimmer.transform.Find ("BallAnchor");
 		transform.parent = ballAnchor;
 		rigidbody.isKinematic = true;
+		rigidbody.detectCollisions = false;
+		
 		transform.localPosition = new Vector3(1f, 0f, 0f);
 		transform.rotation = Quaternion.Euler(0f, 0f, 0f);
 		
