@@ -55,7 +55,7 @@ public class SwimmerBehavior : MonoBehaviour {
 	public BallBehavior BallScript;
 	
 	//TODO: These should probably be moved away from the regular public members.
-	// I don't intend for these to be modified via GUI.
+	//I don't intend for these to be modified via GUI.
 	public float CurrentSpeed = 10;
 	public int TurboAmount = 10;
 	
@@ -194,19 +194,12 @@ public class SwimmerBehavior : MonoBehaviour {
 		_heading = _heading + (_headingDelta * HeadingMultiplier);
 		
 		rigidbody.velocity = _heading * CurrentSpeed;
-		
-		
-		
-		
-		
-		// aniation controller parameters
+			
+		//animation controller parameters
 		_animDirection = Vector3.Cross(_heading, _targetHeading).y;
 		_animSpeed = rigidbody.velocity.magnitude;
 		
-		
-		
-		
-		if (Vector3.Dot(_heading, _targetHeading) < -0.3f ) {
+		if (Vector3.Dot(_heading, _targetHeading) < -0.1f ) {
 			//_animator.SetBool(doFlipHash, true);
 			
 		}
