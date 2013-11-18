@@ -17,20 +17,18 @@ public class BallBehavior : MonoBehaviour {
 	}
 	void OnTriggerExit (Collider collider) {
         if(collider.tag == ValidPlayZoneTag && !collider.GetComponent<BoxCollider>().bounds.Contains(transform.position)) {
-            Reset ();
+            Reset (false);
         }
     }
 	#endregion
 	
-	
-	
 	#region Public Functions and Properties
-	public void Reset () {
+	public void Reset (bool isNeutral = true) {
 		//Handle Ball changes
 		rigidbody.isKinematic = false;
 		rigidbody.detectCollisions = true;
 		var newPosition = respawn.Respawn ();
-		transform.position = new Vector3(newPosition.x, 0, newPosition.y);
+		transform.position = GetNewPosition(isNeutral);
 		rigidbody.velocity = Vector3.zero;
 		
 		ReleaseBallFromHolder();
@@ -83,4 +81,19 @@ public class BallBehavior : MonoBehaviour {
 	}
 	#endregion
 	
+	private Vector3 GetNewPosition(bool isNeutral = true) {
+		var type = RespawnType.Randomize;
+		
+		if (!isNeutral) {
+			if(SwimmerBehavior.LastPossession == PlayerType.PlayerOne) {
+				type = RespawnType.RandomizeRightOnly;
+			}
+			else if(SwimmerBehavior.LastPossession == PlayerType.PlayerOne) {
+				type = RespawnType.RandomizeLeftOnly;
+			}
+		}
+		
+		var newPosition = respawn.Respawn(type);
+		return new Vector3 (newPosition.x, 0f, newPosition.y);
+	}
 }

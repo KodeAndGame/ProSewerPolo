@@ -8,10 +8,22 @@ public enum SwimmerState {
 	BigCatching		//Catch size enlarged -- to aid passing
 }
 
+public enum PlayerType {
+	None,
+	PlayerOne,
+	PlayerTwo
+}
+
+public enum SwimmerSide {
+	Left,
+	Right
+}
+
 public class SwimmerBehavior : MonoBehaviour {
 	
 	#region Static
 	public static  List<SwimmerBehavior> allSwimmers;
+	public static PlayerType LastPossession = PlayerType.None;
 	#endregion
 	
 	#region Protected
@@ -25,6 +37,9 @@ public class SwimmerBehavior : MonoBehaviour {
 	#endregion
 	
 	#region Public Members
+	public PlayerType Player;
+	public SwimmerSide SwimmerSide;
+	
 	//Shooting variables
 	public float MinShootPower = 2300f;
 	public float MaxShootPower = 4600f;
@@ -159,6 +174,8 @@ public class SwimmerBehavior : MonoBehaviour {
 		var center = capsule.center;
 		center.z = .4f;
 		capsule.center = center;
+		
+		LastPossession = Player;
 	}
 	
 	public void SetCatchZoneSize (float newSize) {
