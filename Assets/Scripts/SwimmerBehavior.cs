@@ -393,10 +393,21 @@ public class SwimmerBehavior : MonoBehaviour {
 		if(IndicatorTexture == null) {
 			return;
 		}
+		
 		var indicatorPosition = Camera.main.WorldToScreenPoint(transform.position);
+		var oldColor = GUI.color;
+		
+		if (!isTouchingBall && !IsTouchingBall) {
+			var color = Color.white;
+			color.a = .4f;		
+			GUI.color = color;
+		}
 		
 		//TODO: Don't use magic numbers; take screen resolution into account
-		GUI.DrawTexture(new Rect(indicatorPosition.x - 10, Screen.height - (indicatorPosition.y + 40), 32, 32), IndicatorTexture, ScaleMode.ScaleToFit, true, 0f);
+		GUI.DrawTexture(new Rect(indicatorPosition.x - 10, Screen.height - (indicatorPosition.y + 40), 51, 32), IndicatorTexture, ScaleMode.ScaleToFit, true, 0f);
+		
+		GUI.color = oldColor;
+		
 	}
 	#endregion
 	
