@@ -8,15 +8,32 @@ public enum SwimmerState {
 	BigCatching		//Catch size enlarged -- to aid passing
 }
 
+public enum PlayerType {
+	None,
+	PlayerOne,
+	PlayerTwo
+}
+
+public enum SwimmerSide {
+	Left,
+	Right
+}
+
 public class SwimmerBehavior : MonoBehaviour {
 	
 	#region Static
 	public static  List<SwimmerBehavior> allSwimmers;
+	public static PlayerType LastPossession = PlayerType.None;
 	#endregion
 	
 	#region Protected
-	protected Animator _animator;
+	protected Animator animator;
+	protected float ShotTimer;
+	protected float CatchableTimer;
+	protected float CurrentSpeed;
 	#endregion
+	
+	public int TurboAmount { get; set; }
 	
 	#region Constants
 	private const int PlayerLayer = 9;
@@ -25,8 +42,11 @@ public class SwimmerBehavior : MonoBehaviour {
 	#endregion
 	
 	#region Public Members
+	public PlayerType Player;
+	public SwimmerSide SwimmerSide;
+	
 	//Shooting variables
-	public float _minShootPower2 = 2300f;
+	public float MinShootPower = 2300f;
 	public float MaxShootPower = 4600f;
 	public float MaxShootTime = 2f;
 	
@@ -56,32 +76,27 @@ public class SwimmerBehavior : MonoBehaviour {
 	
 	//TODO: These should probably be moved away from the regular public members.
 	// I don't intend for these to be modified via GUI.
-	public float CurrentSpeed = 10;
-	public int TurboAmount = 100;
+	
+	
 	
 	//public GUIBehavior PowerMeter;
 	#endregion
 	
-	#region Protected Members
-	protected float ShotTimer;
-	protected float CatchableTimer;
-	#endregion
-	
 	#region Private Members
-	private Vector3 _heading = new Vector3(0f, 0f, 0f);	
-	private Vector3 _targetHeading = new Vector3(0f, 0f, 0f);
-	private Vector3 _headingDelta = new Vector3(0f, 0f, 0f);
-	private float _animDirection;
-	private float _animSpeed;
+	private Vector3 heading = new Vector3(0f, 0f, 0f);	
+	private Vector3 targetHeading = new Vector3(0f, 0f, 0f);
+	private Vector3 headingDelta = new Vector3(0f, 0f, 0f);
+	private float animDirection;
+	private float animSpeed;
 	
 	int directionHash, speedHash, doFlipHash;
 	
-	private bool _isTouchingBall = false;
+	private bool isTouchingBall = false;
 	private bool PreviouslyShooting = false , CurrentlyShooting = false;
 	private bool PreviouslyTurbo = false , CurrentlyTurbo = false;
-	private GameObject _ballObject;
-	private SwimmerState _state;
-	private float _stateTimer;
+	private GameObject ballObject;
+	private SwimmerState state;
+	private float stateTimer;
 	private int TurboRechargeCounter;
 	#endregion
 	
@@ -90,14 +105,16 @@ public class SwimmerBehavior : MonoBehaviour {
 	void Start () {
 		AssertValidAxisNames ();
 		SetCatchZoneSize (DefaultZoneSize);
-		_ballObject = BallScript.gameObject;
+		CurrentSpeed = BaseSpeed;
+		TurboAmount = TurboMaxAmount;
+		ballObject = BallScript.gameObject;
 		
 		if(allSwimmers == null) {
 			allSwimmers = new List<SwimmerBehavior> (); 
 		}
 		allSwimmers.Add (this);
 		
-		_animator = GetComponentInChildren<Animator>();
+		animator = GetComponentInChildren<Animator>();
 		
 		directionHash = Animator.StringToHash("Direction");
 		speedHash = Animator.StringToHash("Speed");
@@ -115,8 +132,8 @@ public class SwimmerBehavior : MonoBehaviour {
 	//Called when something enters the catch zone
 	void OnTriggerEnter(Collider other) {
 		if (other.gameObject.tag == "Ball") {			
-			_isTouchingBall = true;			
-			if(!BallScript.IsHeldByPlayer && _state != SwimmerState.ShootRecovery) {
+			isTouchingBall = true;			
+			if(!BallScript.IsHeldByPlayer && state != SwimmerState.ShootRecovery) {
 				BallScript.Pickup(this);
 			}
 		}
@@ -125,7 +142,7 @@ public class SwimmerBehavior : MonoBehaviour {
 	//Called when trigger case ceases
 	void OnTriggerExit(Collider other) {
 		if (other.gameObject.tag == "Ball") {
-			_isTouchingBall = false;
+			isTouchingBall = false;
 		}
 	}
 	#endregion
@@ -137,6 +154,12 @@ public class SwimmerBehavior : MonoBehaviour {
 		Teammate.SetCatchZoneSize(PassingZoneSize);
 		SetSpeed(BaseSpeed);
 		SetState (SwimmerState.ShootRecovery);
+		
+		var capsule = GetComponent<CapsuleCollider>();
+		capsule.radius = .5f;
+		var center = capsule.center;
+		center.z = 0f;
+		capsule.center = center;
 	}
 	
 	public void HandleBallPickup () {				
@@ -147,6 +170,14 @@ public class SwimmerBehavior : MonoBehaviour {
 		
 		gameObject.layer = PlayerHoldingBallLayer;
 		SetSpeed (HoldingSpeed);
+		
+		var capsule = GetComponent<CapsuleCollider>();
+		capsule.radius = 1f;
+		var center = capsule.center;
+		center.z = .4f;
+		capsule.center = center;
+		
+		LastPossession = Player;
 	}
 	
 	public void SetCatchZoneSize (float newSize) {
@@ -165,7 +196,7 @@ public class SwimmerBehavior : MonoBehaviour {
 	public void Reset () {
 		SetState(SwimmerState.Neutral);
 		SetCatchZoneSize( DefaultZoneSize );
-		_stateTimer = 0f;
+		stateTimer = 0f;
 	}
 	#endregion
 	
@@ -190,41 +221,41 @@ public class SwimmerBehavior : MonoBehaviour {
 		
 		//Update velocity
 		var userHeading = new Vector3 (horizontalInput, 0f, verticalInput);
-		_targetHeading = userHeading;
+		targetHeading = userHeading;
 		
-		_headingDelta = _targetHeading - _heading;
-		_heading = _heading + (_headingDelta * HeadingMultiplier);
+		headingDelta = targetHeading - heading;
+		heading = heading + (headingDelta * HeadingMultiplier);
 		
-		rigidbody.velocity = _heading * CurrentSpeed;
+		rigidbody.velocity = heading * CurrentSpeed;
 		
 		
 		
 		
 		
 		// aniation controller parameters
-		_animDirection = Vector3.Cross(_heading, _targetHeading).y;
-		_animSpeed = rigidbody.velocity.magnitude;
+		animDirection = Vector3.Cross(heading, targetHeading).y;
+		animSpeed = rigidbody.velocity.magnitude;
 		
 		
 		
 		
-		if (Vector3.Dot(_heading, _targetHeading) < -0.3f ) {
+		if (Vector3.Dot(heading, targetHeading) < -0.3f ) {
 			//_animator.SetBool(doFlipHash, true);
 			
 		}
 		else {
-			_animator.SetBool(doFlipHash, false);
+			animator.SetBool(doFlipHash, false);
 			//Update direction swimmer is facing (only if either axis is active)
 			if(userHeading != Vector3.zero) {
 				//_heading = userHeading.normalized;
-				var newRotationAroundY = Mathf.Rad2Deg * Mathf.Atan2 (_heading.x, _heading.z);
+				var newRotationAroundY = Mathf.Rad2Deg * Mathf.Atan2 (heading.x, heading.z);
 				var newRotation = Quaternion.Euler(new Vector3(0, newRotationAroundY, 0));
 				transform.rotation = newRotation;
 			}
 		}
 		
-		_animator.SetFloat(directionHash, _animDirection);
-		_animator.SetFloat(speedHash, _animSpeed);
+		animator.SetFloat(directionHash, animDirection);
+		animator.SetFloat(speedHash, animSpeed);
 	}
 
 	void UpdateShoot () {
@@ -245,18 +276,18 @@ public class SwimmerBehavior : MonoBehaviour {
 			{return;}
 		
 		if(PreviouslyShooting && CurrentlyShooting == false){//SHOOT HER!
-			if(BallScript.IsHeldByPlayer && (_ballObject.transform.parent.parent == transform || _isTouchingBall)) {//make sure a player has the ball
+			if(BallScript.IsHeldByPlayer && (ballObject.transform.parent.parent == transform || isTouchingBall)) {//make sure a player has the ball
 				
 				ShotTimer = Time.time - ShotTimer;//time since button was pressed
-				if(ShotTimer  > 2)
-					ShotTimer = 2;
+				if(ShotTimer  > MaxShootTime)
+					ShotTimer = MaxShootTime;
 				
 				var shotPower = ShotTimer / MaxShootTime;//% to modify shot speeed 
-				var additionalPowerPool = MaxShootPower - _minShootPower2;//amount shot can be modified
+				var additionalPowerPool = MaxShootPower - MinShootPower;//amount shot can be modified
 				var additionalPower = additionalPowerPool * shotPower;//power to add
-				var calculatedPower = additionalPower + _minShootPower2;//total power
+				var calculatedPower = additionalPower + MinShootPower;//total power
 				
-				BallScript.Shoot (_heading * calculatedPower);
+				BallScript.Shoot (heading.normalized * calculatedPower);
 				SetState (SwimmerState.ShootRecovery);
 				Teammate.PrepareToCatch();
 				//PowerMeter.ShotPower = 0;
@@ -303,16 +334,16 @@ public class SwimmerBehavior : MonoBehaviour {
 	}
 	
 	void UpdateState () {
-		switch (_state) {
+		switch (state) {
 		case SwimmerState.Neutral:
 			return;
 		default:
-			_stateTimer -= Time.deltaTime;
+			stateTimer -= Time.deltaTime;
 			break;			
 		}
 		
-		if(_stateTimer <= 0f) {
-			if (_state == SwimmerState.ShootRecovery)
+		if(stateTimer <= 0f) {
+			if (state == SwimmerState.ShootRecovery)
 				SetState (SwimmerState.BigCatching);
 			else
 				SetState (SwimmerState.Neutral);
@@ -320,28 +351,28 @@ public class SwimmerBehavior : MonoBehaviour {
 	}
 	#endregion
 	
-	void SetState (SwimmerState state) {
-		ReleaseState (_state);
+	void SetState (SwimmerState newState) {
+		ReleaseState (state);
 		
-		_state = state;
+		state = newState;
 		switch (state) {
 		case SwimmerState.ShootRecovery:
 			SetCatchZoneSize(0f);
-			_stateTimer = ShootRecoveryStateTime;
+			stateTimer = ShootRecoveryStateTime;
 			break;
 		case SwimmerState.BigCatching:
 			SetCatchZoneSize(PassingZoneSize);
-			_stateTimer = CatchableTime;
+			stateTimer = CatchableTime;
 			break;
 		default:
-			_stateTimer = 0f;
+			stateTimer = 0f;
 			break;
 		}
 	}
 	
-	void ReleaseState (SwimmerState state) {
+	void ReleaseState (SwimmerState oldState) {
 		SetCatchZoneSize( DefaultZoneSize );
 		SetSpeed (BaseSpeed);
-		_stateTimer = 0f;
+		stateTimer = 0f;
 	}
 }

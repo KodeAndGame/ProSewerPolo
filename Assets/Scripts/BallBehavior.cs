@@ -9,20 +9,26 @@ public class BallBehavior : MonoBehaviour {
 	private const int PlayerHoldingBallLayer = 8;
 	#endregion
 	
+	private RespawnBehavior respawn;	
+	
 	#region Unity Event Handlers
+	void Start () {
+		respawn = GetComponent("RespawnBehavior") as RespawnBehavior;
+	}
 	void OnTriggerExit (Collider collider) {
         if(collider.tag == ValidPlayZoneTag && !collider.GetComponent<BoxCollider>().bounds.Contains(transform.position)) {
-            Reset ();
+            Reset (false);
         }
     }
 	#endregion
 	
 	#region Public Functions and Properties
-	public void Reset () {
+	public void Reset (bool isNeutral = true) {
 		//Handle Ball changes
 		rigidbody.isKinematic = false;
 		rigidbody.detectCollisions = true;
-		transform.position = Vector3.zero;
+		var newPosition = respawn.Respawn ();
+		transform.position = GetNewPosition(isNeutral);
 		rigidbody.velocity = Vector3.zero;
 		
 		ReleaseBallFromHolder();
@@ -39,7 +45,7 @@ public class BallBehavior : MonoBehaviour {
 		rigidbody.AddForce(force);
 		
 		//Handle Ball parent changes
-		ReleaseBallFromHolder();	
+		ReleaseBallFromHolder();
 	}
 	
 	public void Pickup (SwimmerBehavior swimmerScript) {
@@ -47,6 +53,8 @@ public class BallBehavior : MonoBehaviour {
 		var ballAnchor = swimmer.transform.Find ("BallAnchor");
 		transform.parent = ballAnchor;
 		rigidbody.isKinematic = true;
+		rigidbody.detectCollisions = false;
+		
 		transform.localPosition = new Vector3(1f, 0f, 0f);
 		transform.rotation = Quaternion.Euler(0f, 0f, 0f);
 		
@@ -73,4 +81,19 @@ public class BallBehavior : MonoBehaviour {
 	}
 	#endregion
 	
+	private Vector3 GetNewPosition(bool isNeutral = true) {
+		var type = RespawnType.Randomize;
+		
+		if (!isNeutral) {
+			if(SwimmerBehavior.LastPossession == PlayerType.PlayerOne) {
+				type = RespawnType.RandomizeRightOnly;
+			}
+			else if(SwimmerBehavior.LastPossession == PlayerType.PlayerOne) {
+				type = RespawnType.RandomizeLeftOnly;
+			}
+		}
+		
+		var newPosition = respawn.Respawn(type);
+		return new Vector3 (newPosition.x, 0f, newPosition.y);
+	}
 }
