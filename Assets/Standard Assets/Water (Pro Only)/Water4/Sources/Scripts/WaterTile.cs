@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[ExecuteInEditMode]
+//[ExecuteInEditMode]
 public class WaterTile : MonoBehaviour 
 {
 	public PlanarReflection reflection;

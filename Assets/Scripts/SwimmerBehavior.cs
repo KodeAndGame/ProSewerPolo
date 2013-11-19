@@ -28,7 +28,12 @@ public class SwimmerBehavior : MonoBehaviour {
 	
 	#region Protected
 	protected Animator animator;
+	protected float ShotTimer;
+	protected float CatchableTimer;
+	protected float CurrentSpeed;
 	#endregion
+	
+	public int TurboAmount { get; set; }
 	
 	#region Constants
 	private const int PlayerLayer = 9;
@@ -71,15 +76,10 @@ public class SwimmerBehavior : MonoBehaviour {
 	
 	//TODO: These should probably be moved away from the regular public members.
 	// I don't intend for these to be modified via GUI.
-	public float CurrentSpeed = 10;
-	public int TurboAmount = 100;
+	
+	
 	
 	//public GUIBehavior PowerMeter;
-	#endregion
-	
-	#region Protected Members
-	protected float ShotTimer;
-	protected float CatchableTimer;
 	#endregion
 	
 	#region Private Members
@@ -105,6 +105,8 @@ public class SwimmerBehavior : MonoBehaviour {
 	void Start () {
 		AssertValidAxisNames ();
 		SetCatchZoneSize (DefaultZoneSize);
+		CurrentSpeed = BaseSpeed;
+		TurboAmount = TurboMaxAmount;
 		ballObject = BallScript.gameObject;
 		
 		if(allSwimmers == null) {
