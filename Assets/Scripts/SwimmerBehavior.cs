@@ -26,6 +26,7 @@ public class SwimmerBehavior : MonoBehaviour {
 	#region Static
 	public static  List<SwimmerBehavior> allSwimmers;
 	public static PlayerType LastPossession = PlayerType.None;
+	static bool LungingEnabled = true;	//Disable to remove lunging
 	#endregion
 	
 	#region Protected
@@ -296,7 +297,8 @@ public class SwimmerBehavior : MonoBehaviour {
 			//Without ball, lunge instead
 			if (BallScript.IsHeldByPlayer == false 
 				&& state != SwimmerState.Stunned
-				&& state != SwimmerState.Lunging) {
+				&& state != SwimmerState.Lunging
+				&& LungingEnabled) {
 				SetState (SwimmerState.Lunging);
 			}
 			
