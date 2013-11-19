@@ -37,6 +37,13 @@ public class SwimmerBehavior : MonoBehaviour {
 	#endregion
 	
 	public int TurboAmount { get; set; }
+	public bool IsTouchingBall {
+		get {
+			//TODO: This is terrible and hardcoded at the final hour. Needs to be changed
+			var distance = Vector3.Distance (ballObject.transform.position, transform.position);
+			return distance < 2.5f;
+		}
+	}
 	
 	#region Constants
 	private const int PlayerLayer = 9;
@@ -80,12 +87,7 @@ public class SwimmerBehavior : MonoBehaviour {
 	
 	//Object references
 	public SwimmerBehavior Teammate;
-	public BallBehavior BallScript;
-	
-	//TODO: These should probably be moved away from the regular public members.
-	// I don't intend for these to be modified via GUI.
-	
-	
+	public BallBehavior BallScript;	
 	
 	//public GUIBehavior PowerMeter;
 	#endregion
@@ -308,7 +310,7 @@ public class SwimmerBehavior : MonoBehaviour {
 		}
 		
 		if(PreviouslyShooting && CurrentlyShooting == false){//SHOOT HER!
-			if(BallScript.IsHeldByPlayer && (ballObject.transform.parent.parent == transform || isTouchingBall)) {//make sure a player has the ball
+			if(BallScript.IsHeldByPlayer && (ballObject.transform.parent.parent == transform || isTouchingBall || IsTouchingBall)) {//make sure a player has the ball
 				
 				ShotTimer = Time.time - ShotTimer;//time since button was pressed
 				if(ShotTimer  > MaxShootTime)
