@@ -404,10 +404,8 @@ public class SwimmerBehavior : MonoBehaviour {
 		}
 		
 		//TODO: Don't use magic numbers; take screen resolution into account
-		GUI.DrawTexture(new Rect(indicatorPosition.x - 10, Screen.height - (indicatorPosition.y + 40), 51, 32), IndicatorTexture, ScaleMode.ScaleToFit, true, 0f);
-		
-		GUI.color = oldColor;
-		
+		GUI.DrawTexture(new Rect(indicatorPosition.x - 10, Screen.height - (indicatorPosition.y + 40), 51, 32), IndicatorTexture, ScaleMode.ScaleToFit, true, 0f);		
+		GUI.color = oldColor;		
 	}
 	#endregion
 	
