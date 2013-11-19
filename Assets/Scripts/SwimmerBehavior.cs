@@ -89,6 +89,7 @@ public class SwimmerBehavior : MonoBehaviour {
 	public SwimmerBehavior Teammate;
 	public BallBehavior BallScript;	
 	
+	public Texture IndicatorTexture;
 	//public GUIBehavior PowerMeter;
 	#endregion
 	
@@ -137,6 +138,10 @@ public class SwimmerBehavior : MonoBehaviour {
 		UpdateShoot ();
 		UpdateTurbo ();
 		UpdateState ();
+	}
+	
+	void OnGUI () {
+		RenderIndicator ();
 	}
 	
 	//Called when something enters the catch zone
@@ -382,6 +387,27 @@ public class SwimmerBehavior : MonoBehaviour {
 			else
 				SetState (SwimmerState.Neutral);
 		}
+	}
+	
+	void RenderIndicator () {
+		if(IndicatorTexture == null) {
+			return;
+		}
+		
+		var indicatorPosition = Camera.main.WorldToScreenPoint(transform.position);
+		var oldColor = GUI.color;
+		
+		if (!isTouchingBall && !IsTouchingBall) {
+			var color = Color.white;
+			color.a = .4f;		
+			GUI.color = color;
+		}
+		
+		//TODO: Don't use magic numbers; take screen resolution into account
+		GUI.DrawTexture(new Rect(indicatorPosition.x - 10, Screen.height - (indicatorPosition.y + 40), 51, 32), IndicatorTexture, ScaleMode.ScaleToFit, true, 0f);
+		
+		GUI.color = oldColor;
+		
 	}
 	#endregion
 	
