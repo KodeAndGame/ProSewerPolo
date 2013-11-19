@@ -5,7 +5,9 @@ using System.Collections.Generic;
 public enum SwimmerState {
 	Neutral,		//Default state
 	ShootRecovery,	//Can't catch
-	BigCatching		//Catch size enlarged -- to aid passing
+	BigCatching,	//Catch size enlarged, to aid passing
+	Lunging,		//Brief burst of speed
+	Stunned			//Hit by a lunging player: can't move
 }
 
 public enum PlayerType {
@@ -24,6 +26,7 @@ public class SwimmerBehavior : MonoBehaviour {
 	#region Static
 	public static  List<SwimmerBehavior> allSwimmers;
 	public static PlayerType LastPossession = PlayerType.None;
+	static bool LungingEnabled = false;	//Disable to remove lunging
 	#endregion
 	
 	#region Protected
@@ -62,7 +65,12 @@ public class SwimmerBehavior : MonoBehaviour {
 	public float PassingZoneSize = 2f;
 	public float DefaultZoneSize = 1f;
 	public float ShootRecoveryStateTime = .5f;	//Time to catch again after shooting
-	public float CatchableTime = 2f;				//Time teammate/you have an enlarged catch zone
+	public float CatchableTime = 2f;			//Time teammate/you have an enlarged catch zone
+	
+	//Stun variables
+	public float LungeTime = 1f;	//How long after lunging hitting someone will stun them
+	public float LungeBoost = 800f;	//How much lunging launches player forward
+	public float StunnedTime = 2f;	//Duration lunge-hit player is immobilized
 	
 	//Input names
 	public string HorizontalAxisName;
@@ -133,9 +141,18 @@ public class SwimmerBehavior : MonoBehaviour {
 	void OnTriggerEnter(Collider other) {
 		if (other.gameObject.tag == "Ball") {			
 			isTouchingBall = true;			
-			if(!BallScript.IsHeldByPlayer && state != SwimmerState.ShootRecovery) {
+			
+			//Just-shot and stunned swimmers can't catch
+			if (!BallScript.IsHeldByPlayer 
+				&& state != SwimmerState.ShootRecovery 
+				&& state != SwimmerState.Stunned) {
 				BallScript.Pickup(this);
 			}
+		}
+		
+		//Hit another player while lunging: stun them
+		else if(other.gameObject.tag == "Player" && state == SwimmerState.Lunging) {
+			other.GetComponent<SwimmerBehavior>().BeStunned();
 		}
 	}
 	
@@ -198,6 +215,10 @@ public class SwimmerBehavior : MonoBehaviour {
 		SetCatchZoneSize( DefaultZoneSize );
 		stateTimer = 0f;
 	}
+	
+	public void BeStunned () {
+		SetState(SwimmerState.Stunned);
+	}
 	#endregion
 	
 	#region Startup Helpers
@@ -216,46 +237,48 @@ public class SwimmerBehavior : MonoBehaviour {
 	
 	#region Update Helpers
 	void UpdateMovement () {
-		var horizontalInput = Input.GetAxis (HorizontalAxisName);
-		var verticalInput = Input.GetAxis (VerticalAxisName);
 		
 		//Update velocity
-		var userHeading = new Vector3 (horizontalInput, 0f, verticalInput);
-		targetHeading = userHeading;
-		
-		headingDelta = targetHeading - heading;
-		heading = heading + (headingDelta * HeadingMultiplier);
-		
-		rigidbody.velocity = heading * CurrentSpeed;
-		
-		
-		
-		
-		
-		// aniation controller parameters
-		animDirection = Vector3.Cross(heading, targetHeading).y;
-		animSpeed = rigidbody.velocity.magnitude;
-		
-		
-		
-		
-		if (Vector3.Dot(heading, targetHeading) < -0.3f ) {
-			//_animator.SetBool(doFlipHash, true);
+		if (state != SwimmerState.Stunned) {
+			var horizontalInput = Input.GetAxis (HorizontalAxisName);
+			var verticalInput = Input.GetAxis (VerticalAxisName);
+					
+			var userHeading = new Vector3 (horizontalInput, 0f, verticalInput);
+			targetHeading = userHeading;
 			
-		}
-		else {
-			animator.SetBool(doFlipHash, false);
-			//Update direction swimmer is facing (only if either axis is active)
-			if(userHeading != Vector3.zero) {
-				//_heading = userHeading.normalized;
-				var newRotationAroundY = Mathf.Rad2Deg * Mathf.Atan2 (heading.x, heading.z);
-				var newRotation = Quaternion.Euler(new Vector3(0, newRotationAroundY, 0));
-				transform.rotation = newRotation;
+			headingDelta = targetHeading - heading;
+			heading = heading + (headingDelta * HeadingMultiplier);
+			
+			//Move faster while lunge is active
+			var boost = new Vector3(0,0,0);
+			if(state == SwimmerState.Lunging) {
+				var reduction = 1f - (stateTimer * stateTimer);
+				boost = heading.normalized * LungeBoost * Time.deltaTime * reduction;
 			}
+			rigidbody.velocity = heading * CurrentSpeed + boost;
+			
+			// animation controller parameters
+			animDirection = Vector3.Cross(heading, targetHeading).y;
+			animSpeed = rigidbody.velocity.magnitude;
+			
+			if (Vector3.Dot(heading, targetHeading) < -0.3f ) {
+				//_animator.SetBool(doFlipHash, true);
+				
+			}
+			else {
+				animator.SetBool(doFlipHash, false);
+				//Update direction swimmer is facing (only if either axis is active)
+				if(userHeading != Vector3.zero) {
+					//_heading = userHeading.normalized;
+					var newRotationAroundY = Mathf.Rad2Deg * Mathf.Atan2 (heading.x, heading.z);
+					var newRotation = Quaternion.Euler(new Vector3(0, newRotationAroundY, 0));
+					transform.rotation = newRotation;
+				}
+			}
+			
+			animator.SetFloat(directionHash, animDirection);
+			animator.SetFloat(speedHash, animSpeed);
 		}
-		
-		animator.SetFloat(directionHash, animDirection);
-		animator.SetFloat(speedHash, animSpeed);
 	}
 
 	void UpdateShoot () {
@@ -272,8 +295,17 @@ public class SwimmerBehavior : MonoBehaviour {
 			//}
 		//}
 		
-		if(PreviouslyShooting && CurrentlyShooting)//increment shotBar
-			{return;}
+		if(CurrentlyShooting) {			
+			//Without ball, lunge instead
+			if (BallScript.IsHeldByPlayer == false 
+				&& state != SwimmerState.Stunned
+				&& state != SwimmerState.Lunging
+				&& LungingEnabled) {
+				SetState (SwimmerState.Lunging);
+			}
+			
+			return;
+		}
 		
 		if(PreviouslyShooting && CurrentlyShooting == false){//SHOOT HER!
 			if(BallScript.IsHeldByPlayer && (ballObject.transform.parent.parent == transform || isTouchingBall)) {//make sure a player has the ball
@@ -323,12 +355,12 @@ public class SwimmerBehavior : MonoBehaviour {
 		}
 		
 		if(TurboAmount == 0 || PreviouslyTurbo && CurrentlyTurbo == false){//decrease speed
-			CurrentSpeed = BaseSpeed;
+			SetSpeed(BaseSpeed);
 			return;
 		}
 		
 		if(TurboAmount != 0 && PreviouslyTurbo == false && CurrentlyTurbo){//increase speed.
-			CurrentSpeed = BaseSpeed + TurboSpeedIncrease;
+			SetSpeed(BaseSpeed + TurboSpeedIncrease);
 			return;
 		}
 	}
@@ -363,6 +395,12 @@ public class SwimmerBehavior : MonoBehaviour {
 		case SwimmerState.BigCatching:
 			SetCatchZoneSize(PassingZoneSize);
 			stateTimer = CatchableTime;
+			break;
+		case SwimmerState.Lunging:
+			stateTimer = LungeTime;
+			break;
+		case SwimmerState.Stunned:
+			stateTimer = StunnedTime;
 			break;
 		default:
 			stateTimer = 0f;

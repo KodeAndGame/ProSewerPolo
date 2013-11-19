@@ -27,7 +27,6 @@ public class BallBehavior : MonoBehaviour {
 		//Handle Ball changes
 		rigidbody.isKinematic = false;
 		rigidbody.detectCollisions = true;
-		var newPosition = respawn.Respawn ();
 		transform.position = GetNewPosition(isNeutral);
 		rigidbody.velocity = Vector3.zero;
 		
