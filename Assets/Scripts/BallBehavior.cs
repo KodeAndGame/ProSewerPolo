@@ -18,12 +18,8 @@ public class BallBehavior : MonoBehaviour {
 	}
 	void OnTriggerExit (Collider collider) {
         if(collider.tag == ValidPlayZoneTag && !collider.GetComponent<BoxCollider>().bounds.Contains(transform.position)) {
-<<<<<<< HEAD
-            Reset (false);
-=======
 			AudioSource.PlayClipAtPoint(Whistle, Camera.main.transform.position);
-            Reset ();
->>>>>>> origin/Sound-Effects
+            Reset (false);
         }
     }
 	#endregion
