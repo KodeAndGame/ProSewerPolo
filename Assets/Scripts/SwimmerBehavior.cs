@@ -226,7 +226,7 @@ public class SwimmerBehavior : MonoBehaviour {
 		_animator.SetFloat(directionHash, _animDirection);
 		_animator.SetFloat(speedHash, _animSpeed);
 	}
-
+	
 	void UpdateShoot () {
 		PreviouslyShooting = CurrentlyShooting;
 		CurrentlyShooting = (Input.GetAxis(ShootAxisName) > 0f);

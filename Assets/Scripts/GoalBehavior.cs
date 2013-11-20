@@ -20,8 +20,6 @@ public class GoalBehavior : MonoBehaviour {
 		
 		AudioSource.PlayClipAtPoint(AirHorn, Camera.main.transform.position);
 		
-		yield return new WaitForSeconds (1);//to make it seems a bit less like magic
-		
 		//reset ball
 		ballObject.Reset ();//reset ball
 	}
