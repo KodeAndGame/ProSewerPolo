@@ -7,6 +7,7 @@ public class BallBehavior : MonoBehaviour {
 	private const string ValidPlayZoneTag = "Respawn";
 	private const int PlayerLayer = 9;
 	private const int PlayerHoldingBallLayer = 8;
+	public AudioClip Whistle;
 	#endregion
 	
 	private RespawnBehavior respawn;	
@@ -17,7 +18,12 @@ public class BallBehavior : MonoBehaviour {
 	}
 	void OnTriggerExit (Collider collider) {
         if(collider.tag == ValidPlayZoneTag && !collider.GetComponent<BoxCollider>().bounds.Contains(transform.position)) {
+<<<<<<< HEAD
             Reset (false);
+=======
+			AudioSource.PlayClipAtPoint(Whistle, Camera.main.transform.position);
+            Reset ();
+>>>>>>> origin/Sound-Effects
         }
     }
 	#endregion
