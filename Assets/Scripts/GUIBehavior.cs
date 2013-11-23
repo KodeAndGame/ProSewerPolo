@@ -10,8 +10,12 @@ public class GUIBehavior : MonoBehaviour {
 	public int redScore = 0, blueScore = 0;
 	public SwimmerBehavior Swimmer1, Swimmer2, Swimmer3, Swimmer4;
 	public int MaxScore = 10;
+	
 	protected float WinScreenTimer = 0f;
 	private bool showPlayText;
+
+	protected string WinScreenMessage = string.Empty;
+
 	
 	public void AddPointToScore(bool isRedTeam) {
 		if(isRedTeam) {
@@ -23,8 +27,17 @@ public class GUIBehavior : MonoBehaviour {
 		
 		if(redScore >= MaxScore || blueScore >= MaxScore) {
 			GameStateManager.singleton.State = GameState.WinScreen;
+
 			StartCoroutine(TogglePlay());
-		}
+
+			
+			if(redScore >= MaxScore) {
+				WinScreenMessage = "Red Team Wins";
+			}
+			else if (blueScore >= MaxScore) {
+				WinScreenMessage = "Blue Team Wins";
+			}
+}
 	}
 	
 	void Update () {
@@ -37,7 +50,7 @@ public class GUIBehavior : MonoBehaviour {
 	
 	void OnGUI(){
 		if(GameStateManager.singleton.State == GameState.WinScreen) {
-			GUI.Label(new Rect(Screen.width / 2 - 200, Screen.height / 2 - 100, 200, 200), "Blue Team Wins", BlueScoreStyle);
+			GUI.Label(new Rect(Screen.width / 2 - 200, Screen.height / 2 - 100, 200, 200), WinScreenMessage, BlueScoreStyle);
 			WinScreenTimer += Time.deltaTime;
 			
 			if (showPlayText) {  	
