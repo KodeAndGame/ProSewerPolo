@@ -7,8 +7,35 @@ public class GUIBehavior : MonoBehaviour {
 	public GUIStyle BlueTurboStyle, RedTurboStyle;
 	public int redScore = 0, blueScore = 0;
 	public SwimmerBehavior Swimmer1, Swimmer2, Swimmer3, Swimmer4;
+	public int MaxScore = 10;
+	protected float WinScreenTimer = 0f;
+	
+	public void AddPointToScore(bool isRedTeam) {
+		if(isRedTeam) {
+			redScore++;
+		}
+		else {
+			blueScore++;
+		}
+		
+		if(redScore >= MaxScore || blueScore >= MaxScore) {
+			GameStateManager.singleton.State = GameState.WinScreen;
+		}
+	}
+	
+	void Update () {
+		if (GameStateManager.singleton.State == GameState.WinScreen && WinScreenTimer > 2f && Input.anyKeyDown)
+		{
+			GameStateManager.singleton.State = GameState.Play;
+			Application.LoadLevel("master");
+		}
+	}
 	
 	void OnGUI(){
+		if(GameStateManager.singleton.State == GameState.WinScreen) {
+			GUI.Label(new Rect(Screen.width / 2 - 200, Screen.height / 2 - 100, 200, 200), "Blue Team Wins", BlueScoreStyle);
+			WinScreenTimer += Time.deltaTime;
+		}
 		
 		//Turbo Bars
 		GUI.Label(new Rect(10, 80, Swimmer1.TurboAmount, 15),"Left Turbo", BlueTurboStyle);

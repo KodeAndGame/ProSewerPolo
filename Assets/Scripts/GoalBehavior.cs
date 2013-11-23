@@ -12,11 +12,7 @@ public class GoalBehavior : MonoBehaviour {
 			return; //don't do anything if it's not the ball
 
 		// Increment variable to keep track of score
-		if (this.tag == "BlueGoal")
-			++ scoreObject.redScore;//increment RedScore
-		
-		else if (this.tag == "RedGoal")
-			++ scoreObject.blueScore;//increment BlueScore
+		scoreObject.AddPointToScore(this.tag == "RedGoal");
 		
 		AudioSource.PlayClipAtPoint(AirHorn, Camera.main.transform.position);
 		
