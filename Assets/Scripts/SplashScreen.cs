@@ -32,15 +32,14 @@ public class SplashScreen : MonoBehaviour {
 	void OnGUI () {
 		GUI.DrawTexture(new Rect(0, 0, Camera.main.pixelWidth, Camera.main.pixelHeight), splashTxt, ScaleMode.ScaleToFit, false, 1.77f);			
 		if (showPlayText) {  	
-			GUI.Label(new Rect((Camera.main.pixelHeight/10), (Camera.main.pixelHeight/2), 400, 72), "PRESS SHOOT TO PLAY", SplashStyle);
+			GUI.Label(new Rect((Camera.main.pixelWidth/10), (Camera.main.pixelHeight/2), 400, 72), "PRESS SHOOT TO PLAY", SplashStyle);
 		}
 	}
 	
 	IEnumerator TogglePlay () {
 		showPlayText = !showPlayText;
-		yield return new WaitForSeconds(0.75f);
+		yield return new WaitForSeconds(0.72f);
 		StartCoroutine(TogglePlay());
-		Debug.Log("showPlayText: " + showPlayText);
 	}
 	
 }

@@ -5,10 +5,13 @@ public class GUIBehavior : MonoBehaviour {
 	
 	public GUIStyle BlueScoreStyle, RedScoreStyle;
 	public GUIStyle BlueTurboStyle, RedTurboStyle;
+	public GUIStyle SplashStyle;
+	
 	public int redScore = 0, blueScore = 0;
 	public SwimmerBehavior Swimmer1, Swimmer2, Swimmer3, Swimmer4;
 	public int MaxScore = 10;
 	protected float WinScreenTimer = 0f;
+	private bool showPlayText;
 	
 	public void AddPointToScore(bool isRedTeam) {
 		if(isRedTeam) {
@@ -20,6 +23,7 @@ public class GUIBehavior : MonoBehaviour {
 		
 		if(redScore >= MaxScore || blueScore >= MaxScore) {
 			GameStateManager.singleton.State = GameState.WinScreen;
+			StartCoroutine(TogglePlay());
 		}
 	}
 	
@@ -35,6 +39,10 @@ public class GUIBehavior : MonoBehaviour {
 		if(GameStateManager.singleton.State == GameState.WinScreen) {
 			GUI.Label(new Rect(Screen.width / 2 - 200, Screen.height / 2 - 100, 200, 200), "Blue Team Wins", BlueScoreStyle);
 			WinScreenTimer += Time.deltaTime;
+			
+			if (showPlayText) {  	
+				GUI.Label(new Rect((Camera.main.pixelWidth/2 - 200), (Camera.main.pixelHeight/2), 400, 72), "PRESS TO RESTART", SplashStyle);
+			}
 		}
 		
 		//Turbo Bars
@@ -45,5 +53,18 @@ public class GUIBehavior : MonoBehaviour {
 		
 		GUI.Label(new Rect(10, 10, 100, 100), blueScore.ToString(), BlueScoreStyle);//blueScore
 		GUI.Label(new Rect(Screen.width - 115, 10, 100, 100), redScore.ToString(), RedScoreStyle);//redScore
-	}	
+		
+		
+	}
+	
+	IEnumerator TogglePlay () {
+		if (GameStateManager.singleton.State == GameState.WinScreen) {
+			showPlayText = !showPlayText;
+			yield return new WaitForSeconds(0.72f);
+			StartCoroutine(TogglePlay());
+		}
+		else {
+			showPlayText = false;
+		}
+	}
 }
