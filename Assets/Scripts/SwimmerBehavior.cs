@@ -248,12 +248,28 @@ public class SwimmerBehavior : MonoBehaviour {
 	#region Update Helpers
 	void UpdateMovement () {
 		
+		if(state == SwimmerState.Stunned) {
+			return;
+		}
+		
+		var horizontalInput = Input.GetAxis (HorizontalAxisName);
+		var verticalInput = Input.GetAxis (VerticalAxisName);				
+		var userHeading = new Vector3 (horizontalInput, 0f, verticalInput);
+	
+		
+		if(CurrentlyShooting) {
+			rigidbody.velocity = Vector3.MoveTowards (rigidbody.velocity, Vector3.zero, 20 * Time.deltaTime);
+			
+			if(userHeading != Vector3.zero) {
+				heading = userHeading;
+			}
+			var newRotationAroundY = Mathf.Rad2Deg * Mathf.Atan2 (heading.x, heading.z);
+			var newRotation = Quaternion.Euler(new Vector3(0, newRotationAroundY, 0));
+			transform.rotation = newRotation;
+		}
 		//Update velocity
-		if (state != SwimmerState.Stunned) {
-			var horizontalInput = Input.GetAxis (HorizontalAxisName);
-			var verticalInput = Input.GetAxis (VerticalAxisName);
-					
-			var userHeading = new Vector3 (horizontalInput, 0f, verticalInput);
+		else {
+			
 			targetHeading = userHeading;
 			
 			headingDelta = targetHeading - heading;
@@ -340,6 +356,7 @@ public class SwimmerBehavior : MonoBehaviour {
 			
 		if(PreviouslyShooting == false && CurrentlyShooting){//start the timer
 			ShotTimer = Time.time;
+			rigidbody.velocity = Vector3.zero;
 			return;
 		}
     }
