@@ -134,6 +134,9 @@ public class SwimmerBehavior : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if(GameStateManager.singleton.State != GameState.Play) {
+			return;
+		}
 		UpdateMovement ();
 		UpdateShoot ();
 		UpdateTurbo ();

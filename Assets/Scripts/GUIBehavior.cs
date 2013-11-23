@@ -7,6 +7,20 @@ public class GUIBehavior : MonoBehaviour {
 	public GUIStyle BlueTurboStyle, RedTurboStyle;
 	public int redScore = 0, blueScore = 0;
 	public SwimmerBehavior Swimmer1, Swimmer2, Swimmer3, Swimmer4;
+	public int MaxScore = 10;
+	
+	public void AddPointToScore(bool isRedTeam) {
+		if(isRedTeam) {
+			redScore++;
+		}
+		else {
+			blueScore++;
+		}
+		
+		if(redScore >= MaxScore || blueScore >= MaxScore) {
+			GameStateManager.singleton.State = GameState.WinScreenTransition;
+		}
+	}
 	
 	void OnGUI(){
 		
