@@ -310,7 +310,6 @@ public class SwimmerBehavior : MonoBehaviour {
 	void UpdateShoot () {
 		PreviouslyShooting = CurrentlyShooting;
 		CurrentlyShooting = (Input.GetAxis(ShootAxisName) > 0f);
-		
 		if(PreviouslyShooting == false && CurrentlyShooting == false)//nothing needs to be done
 			return;
 		
