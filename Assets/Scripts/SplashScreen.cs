@@ -15,15 +15,9 @@ public class SplashScreen : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
-		foreach (string axis in ShootAxes) {
-			if (Input.GetAxis(axis) > 0f) {
-				// go to the next level
-				Application.LoadLevel("master");
-				
-				return;	
-			}
-			
+
+		if(Input.anyKeyDown) {
+			Application.LoadLevel("master");
 		}
 	}
 	
