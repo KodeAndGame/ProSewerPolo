@@ -29,9 +29,9 @@ Classes
 - *MatchFactory* (Factory)
 - *Match* (MonoBehavior)
 - *ModifierManager* (Singleton)
-- *SwimmerAnimation
+- *SwimmerAnimation*
 - *SwimmerBehavior*
-- *ISwimmerController (Interface)
+- *ISwimmerController* (Interface)
 - *PhysicalSwimmerController* (MonoBehavior)
 - *ArtificialSwimmerController* (MonoBehavior)
 - *SwimmerControllerFactory* (Factory)
