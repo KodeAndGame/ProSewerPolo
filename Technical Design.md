@@ -17,6 +17,7 @@ Technical Terminology
 - *Factory*
 - *GameObject*
 - *MonoBehavior*
+- *Interface*
 
 Namespaces
 -----------------
@@ -26,5 +27,12 @@ Classes
 - *ApplicationManager* (Singleton)
 - *MatchTypes* (Enum)
 - *MatchFactory* (Factory)
-- *MatchManager*
+- *Match* (MonoBehavior)
 - *ModifierManager* (Singleton)
+- *SwimmerAnimation
+- *SwimmerBehavior*
+- *ISwimmerController (Interface)
+- *PhysicalSwimmerController* (MonoBehavior)
+- *ArtificialSwimmerController* (MonoBehavior)
+- *SwimmerControllerFactory* (Factory)
+- *SwimmerInput* 
